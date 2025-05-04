@@ -1,0 +1,87 @@
+{
+	"name": "@cleanweb/oore",
+	"version": "1.0.0",
+	"description": "A library of helpers for writing cleaner React function components.",
+	"engines": {
+		"node": ">=18"
+	},
+	"files": [
+		"build",
+		".npmrc"
+	],
+	"main": "build/index.js",
+	"//exports/.": {
+		"require": "./src/index.cjs",
+		"import": "./src/index.mjs"
+	},
+	"//type": "module",
+	"exports": {
+		".": "./build/classy/index.js",
+		"./base": "./build/base/index.js",
+		"./helpers": "./build/helpers/index.js",
+		"./all": "./build/index.js"
+	},
+	"scripts": {
+		"prebuild": "rimraf ./build && npm run build:docs",
+		"build": "tsc && tsc-alias",
+		"serve-docs": "serve docs",
+		"postbuild": "copyfiles tsconfig.json build",
+		"build:docs": "typedoc",
+		"_": "",
+		"prepublishOnly": "npm run build",
+		"publish:patch": "npm version patch && npm publish",
+		"publish:minor": "npm version minor && npm publish",
+		"publish:major": "npm version major && npm publish",
+		"__": "/// Increment beta number for the current patch version. ///",
+		"publish:beta:current": "npm version prerelease --preid beta && npm publish --tag beta",
+		"___": "/// Create a beta.0 for a new patch/minor/major version ///",
+		"publish:beta:new-patch": "npm version prepatch --preid beta && npm publish --tag beta",
+		"publish:beta:new-minor": "npm version preminor --preid beta && npm publish --tag beta",
+		"publish:beta:new-major": "npm version premajor --preid beta && npm publish --tag beta",
+		"____": "",
+		"//postpublish": "cd ./mirror-pkg && npm publish && cd ..",
+		"______": "",
+		"test": "echo \"No tests ATM\""
+	},
+	"keywords": [
+		"react",
+		"function components",
+		"class components",
+		"hooks",
+		"react hooks",
+		"react state",
+		"state",
+		"clean state",
+		"group state",
+		"grouped state"
+	],
+	"author": {
+		"name": "Feranmi Akinlade",
+		"url": "https://feranmi.dev"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"@babel/eslint-parser": "^7.25.9",
+		"@babel/preset-typescript": "^7.26.0",
+		"@types/node": "20.14.10",
+		"@types/react": "^16",
+		"@types/webpack-env": "^1.18.8",
+		"babel-preset-react-app": "^10.0.1",
+		"copyfiles": "^2.4.1",
+		"eslint": "^9.15.0",
+		"eslint-plugin-jsdoc": "^50.5.0",
+		"eslint-plugin-react": "^7.37.2",
+		"globals": "^15.12.0",
+		"rimraf": "^6.0.1",
+		"serve": "^14.2.4",
+		"tsc-alias": "1.8.10",
+		"typedoc": "latest",
+		"typedoc-plugin-coverage": "^3.4.1",
+		"typedoc-plugin-markdown": "^4.4.1",
+		"typedoc-plugin-mdn-links": "^4.0.13",
+		"typescript": "^5.6.2"
+	},
+	"peerDependencies": {
+		"react": ">=16"
+	}
+}

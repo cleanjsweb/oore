@@ -1,0 +1,12 @@
+node_modules/
+
+build
+docs
+
+
+# Typescript
+*.tsbuildinfo
+
+
+# Misc
+.DS_Store

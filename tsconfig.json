@@ -1,0 +1,49 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"rootDir": ".",
+		"outDir": "build",
+		"paths": {
+			"@/*": [
+				"./*"
+			]
+		},
+		"target": "es5",
+		"lib": [
+			"dom",
+			"dom.iterable",
+			"esnext"
+		],
+		"allowJs": true,
+		"checkJs": true,
+		"declaration": true,
+		"noEmit": false,
+		"skipLibCheck": true,
+		"strict": false,
+		"forceConsistentCasingInFileNames": true,
+		"incremental": false,
+		"esModuleInterop": true,
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"jsx": "react-jsx",
+		"strictNullChecks": true,
+		"strictPropertyInitialization": true,
+		"noImplicitAny": true,
+		"noUncheckedIndexedAccess": true,
+		"strictBindCallApply": true,
+		"exactOptionalPropertyTypes": true,
+	},
+	"include": [
+		// "**/[!globals].ts",
+		"**/*.ts",
+		"**/*.tsx"
+	],
+	"exclude": [
+		"**/globals.ts",
+		"node_modules/**/**.*",
+		"build/**/**.*",
+		"mirror-pkg/**/**.*"
+	]
+}

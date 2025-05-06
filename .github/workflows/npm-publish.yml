@@ -1,0 +1,54 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+
+name: Publish to NPM
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main", "chore/fa-release-pipeline"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: read
+  id-token: read
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - name: Commit Autotag
+        uses: Bullrich/commit-autotag@v1.0.1
+        with:
+          # Autotag will look for the appropriate file in in this location (relative to project root).
+          root: "./" # optional, default is ./
+          # Head branch to compare changes. It uses master by default
+          head_branch: main # optional, default is master
+          # Options include 'package' (for package.json), 'docker' (for Dockerfile), and 'regex' to extract from an arbitrary file. This does not need to be specified if the "regex_pattern" property is provided.
+          strategy: package # optional, default is package
+          # By default, package.json uses semantic versioning, such as "1.0.0". A prefix can be used to add text before the tag name. For example, if tag_prefx is set to "v", then the tag would be labeled as "v1.0.0".
+          tag_prefix: v # optional
+          # Text which is applied to the end of the tag.
+          # tag_suffix: # optional
+          # This is the annotated commit message associated with the tag. By default, a changelog will be generated from the commits between the latest tag and the new tag (HEAD). This will override that with a hard-coded message.
+          # tag_message: # optional
+          # The commit message template (per commit). Default is `{{number}}) {{message}} ({{author}}) SHA: {{sha}}`
+          # commit_message_template: # optional
+          # Explicitly set the version here instead of automatically detecting from `package.json`. Useful for non-JavaScript projects where version may be output by a previous action.
+          # version: # optional
+          # An optional attribute containing the regular expression used to extract the version number.
+          # regex_pattern: # optional
+      - run: npm run build
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}

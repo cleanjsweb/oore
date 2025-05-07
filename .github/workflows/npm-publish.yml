@@ -48,8 +48,9 @@ jobs:
           # version: # optional
           # An optional attribute containing the regular expression used to extract the version number.
           # regex_pattern: # optional
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: npm run build
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

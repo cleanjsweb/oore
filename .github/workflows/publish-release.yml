@@ -71,6 +71,7 @@ jobs:
           # Message of the tag to update
           tag-message: This tag marks the commit of the latest stable release.
       - name: Create Github Release
+        id: github_release
         uses: Akryum/release-tag@v4.0.3
         with:
           # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
@@ -83,10 +84,14 @@ jobs:
           draft: true # optional
           # `true` to identify the release as a prerelease. `false` to identify the release as a full release. Default: `false`
           prerelease: ${{contains(steps.add_version_tag.outputs.tagname, '-')}} # optional
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-docs:
     runs-on: ubuntu-latest
-    if: github.ref_name == 'main'
+    needs: publish-release
+    # 'main'
+    if: github.ref_name == 'chore/fa-release-pipeline'
     steps:
       - name: Checkout
         uses: actions/checkout@v4

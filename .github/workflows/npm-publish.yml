@@ -6,7 +6,7 @@ name: Publish to NPM
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main", "chore/fa-release-pipeline"]
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -50,7 +50,6 @@ jobs:
           # regex_pattern: # optional
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm run build
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

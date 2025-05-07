@@ -72,6 +72,8 @@ jobs:
           tag-name: latest
           # Message of the tag to update
           tag-message: This tag marks the commit of the latest stable release.
+      - name: Check Outputs
+        run: echo "${{ toJSON(steps.add_version_tag.outputs) }}"
       - name: Create Github Release
         id: github_release
         uses: Akryum/release-tag@v4.0.3

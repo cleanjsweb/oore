@@ -40,7 +40,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Add Version Tag
-        if: false
         id: add_version_tag
         uses: Bullrich/commit-autotag@v1.0.1
         with:

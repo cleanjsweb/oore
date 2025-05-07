@@ -35,17 +35,8 @@ jobs:
       #   with:
       #     source: ./
       #     destination: ./_site
-      - name: Nix Shell
-        uses: workflow/nix-shell-action@v3.4.0
-        with:
-          # Interpreter to use in the nix shell shebang
-          interpreter: bash # optional, default is bash
-          # Comma-separated list of packages to pre-install in your shell. Defaults to simply "bash". Cannot be used together with the flakes option
-          # packages: # optional, default is bash
-          # The actual script to execute in the shell
-          script: npm ci && npm run build:docs
-          # Execute the script inside the specified working directory instead of the repository root. Example: path/to/dir
-          # working-directory: # optional
+      - name: Build
+        run: pwd && ls && npm ci && npm run build:docs
           
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3.0.1

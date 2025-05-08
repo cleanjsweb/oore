@@ -1,6 +1,6 @@
 {
 	"name": "@cleanweb/oore",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "A library of helpers for writing cleaner React function components with object-oriented patterns.",
 	"engines": {
 		"node": ">=18"

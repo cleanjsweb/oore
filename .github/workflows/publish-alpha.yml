@@ -1,0 +1,35 @@
+
+name: Publish Alpha Release for PRs
+
+on:
+  # Runs on pushes targeting the default branch
+  pull_request:
+    branches: ["stable", "beta", "lts/*"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# concurrency:
+#   group: "publish-release"
+#   cancel-in-progress: false
+
+# /^\/o(?=(\/|$))/.test('/o');
+
+jobs:
+  alpha-release:
+    if: github.head_ref != 'beta' && !github.event.pull_request.draft
+    uses: ./.github/workflows/publish-release.yml
+    with:
+      channel: alpha
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

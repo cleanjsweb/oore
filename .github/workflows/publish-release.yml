@@ -76,7 +76,7 @@ jobs:
         run: echo "${{ toJSON(steps.add_version_tag.outputs) }}"
 
       - run: npm ci
-      - run: npm version ${{ steps.add_version_tag.outputs.tagname }}
+      - run: npm version ${{ steps.add_version_tag.outputs.tagname }} --no-git-tag-version
       - run: npm publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -2,9 +2,8 @@
 name: Publish Alpha Release for PRs
 
 on:
-  # Runs on pushes targeting the default branch
   pull_request:
-    branches: ["stable", "beta", "lts/*"]
+    branches: ["main", "beta", "lts/*"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

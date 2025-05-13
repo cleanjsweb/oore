@@ -29,7 +29,7 @@ jobs:
       - name: Use Source Branch #  | xargs echo
         # && inputs.channel == 'alpha'
         if: github.event_name == 'pull_request'
-        run: echo "${{ github.base_ref }}" # git checkout 
+        run: echo "${{ github.head_ref }}" && git checkout ${{ github.head_ref }}
 
       - name: Get Revision Index #  | xargs echo
         if: inputs.channel != 'stable'
@@ -37,7 +37,7 @@ jobs:
         run: echo "new_index=$(git tag -l 'v1.0.1-alpha.[0-9]*' | wc -l | xargs echo)" >> $GITHUB_OUTPUT
       - name: Print Revision Index #  | xargs echo
         if: inputs.channel != 'stable'
-        run: echo ${{ steps.get_revision_count.outputs.new_index }}
+        run: git tag -l 'v1.0.1-alpha.[0-9]*' | wc -l | xargs echo && echo ${{ steps.get_revision_count.outputs.new_index }}
       - name: Add Version Tag
         id: add_version_tag
         uses: Bullrich/commit-autotag@v1.0.1

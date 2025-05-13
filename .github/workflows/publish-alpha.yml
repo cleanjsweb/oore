@@ -38,7 +38,7 @@ jobs:
     uses: ./.github/workflows/publish-release.yml
     with:
       channel: alpha
-      package_spec: ${{ fromJson(needs.get-info.outputs.package_spec) }}
+      package_spec: ${{ needs.get-info.outputs.package_spec }}
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # GITHUB_TOKEN: ${ { secrets.GITHUB_TOKEN }}

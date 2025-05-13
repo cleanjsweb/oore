@@ -19,6 +19,10 @@ on:
 jobs:
   publish-release:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package_spec:
+          - ${{ fromJson(inputs.package_spec) }}
     steps:
       - uses: actions/checkout@v4
         with:

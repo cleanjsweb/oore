@@ -40,7 +40,7 @@ jobs:
         run: echo "new_index=$(git tag -l 'v${{fromJson(inputs.package_spec).version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" >> $GITHUB_OUTPUT
       - name: Print Revision Index #  | xargs echo
         if: inputs.channel != 'stable'
-        run: echo "new_index=$(git tag -l 'v${{fromJson(inputs.package_spec).version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" && echo "${{ steps.get_revision_index.outputs.new_index }}"
+        run: echo "${{inputs.package_spec}}"
       - name: Add Version Tag
         id: add_version_tag
         uses: Bullrich/commit-autotag@v1.0.1

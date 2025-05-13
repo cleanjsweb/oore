@@ -62,6 +62,8 @@ jobs:
           # regex_pattern: # optional
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check current branch
+        run: git branch && git tag -l
       - name: Add "latest" Tag
         if: inputs.channel == 'stable'
         uses: weareyipyip/walking-tag-action@v2.0.0

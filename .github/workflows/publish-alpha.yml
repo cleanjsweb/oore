@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Get Package Spec
         id: package_spec
-        run: echo "spec=$(npm list . --json)" >> "$GITHUB_OUTPUT"
+        run: echo "spec=$(npm list . --json)" >> "$GITHUB_OUTPUT" && <$GITHUB_OUTPUT
   alpha-release:
     needs: get-info
     if: github.head_ref != 'beta' && !github.event.pull_request.draft

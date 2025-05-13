@@ -33,7 +33,7 @@ jobs:
 
       - name: Get Current Stable Version
         id: extract_version
-        run: echo "version=$(npm list . --json | jq .version)" >> "$GITHUB_OUTPUT" && echo "$(<$GITHUB_OUTPUT)"
+        run: echo "version=$(npm list . --json | jq .version | xargs echo)" >> "$GITHUB_OUTPUT" && echo "$(<$GITHUB_OUTPUT)"
   
       - name: Get Revision Index #  | xargs echo
         if: inputs.channel != 'stable'

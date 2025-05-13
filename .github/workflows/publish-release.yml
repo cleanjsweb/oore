@@ -41,10 +41,10 @@ jobs:
       - name: Get Revision Index #  | xargs echo
         if: inputs.channel != 'stable'
         id: get_revision_index
-        run: echo "new_index=$(git tag -l 'v${{inputs.package_spec.version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" >> $GITHUB_OUTPUT
+        run: echo "new_index=$(git tag -l 'v${{matrix.package_spec.version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" >> $GITHUB_OUTPUT
       - name: Print Revision Index #  | xargs echo
         if: inputs.channel != 'stable'
-        run: echo "new_index=$(git tag -l 'v${{inputs.package_spec.version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" && echo "${{ steps.get_revision_index.outputs.new_index }}"
+        run: echo "new_index=$(git tag -l 'v${{matrix.package_spec.version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" && echo "${{ steps.get_revision_index.outputs.new_index }}"
       - name: Add Version Tag
         id: add_version_tag
         uses: Bullrich/commit-autotag@v1.0.1

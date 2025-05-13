@@ -31,17 +31,17 @@ jobs:
         if: github.event_name == 'pull_request'
         run: echo "${{ github.head_ref }}" && git checkout ${{ github.head_ref }}
 
-      - name: Get Package Spec
-        id: package_spec
-        run: echo "spec=$(npm list . --json | jq . -Rsa)" >> "$GITHUB_OUTPUT" && echo "$(<$GITHUB_OUTPUT)"
+      - name: Get Current Stable Version
+        id: extract_version
+        run: echo "version=$(npm list . --json | jq .version)" >> "$GITHUB_OUTPUT" && echo "$(<$GITHUB_OUTPUT)"
   
       - name: Get Revision Index #  | xargs echo
         if: inputs.channel != 'stable'
         id: get_revision_index
-        run: echo "new_index=$(git tag -l 'v${{fromJson(steps.package_spec.outputs.spec).version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" >> $GITHUB_OUTPUT
+        run: echo "new_index=$(git tag -l 'v${{steps.extract_version.outputs.version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" >> $GITHUB_OUTPUT && echo "$(<$GITHUB_OUTPUT)"
       - name: Print Revision Index #  | xargs echo
         if: inputs.channel != 'stable'
-        run: echo ${{fromJson(steps.package_spec.outputs.spec).version}}
+        run: echo ${{steps.extract_version.outputs.version}}
       - name: Add Version Tag
         id: add_version_tag
         uses: Bullrich/commit-autotag@v1.0.1

@@ -33,7 +33,7 @@ jobs:
 
       - name: Get Package Spec
         id: package_spec
-        run: echo "spec=$(npm list . --json)" >> "$GITHUB_OUTPUT" && echo "$(<$GITHUB_OUTPUT)"
+        run: echo "spec=$(npm list . --json| jq . -Rsa)" >> "$GITHUB_OUTPUT" && echo "$(<$GITHUB_OUTPUT)"
   
       - name: Get Revision Index #  | xargs echo
         if: inputs.channel != 'stable'

@@ -39,9 +39,11 @@ jobs:
         if: inputs.channel != 'stable'
         id: get_revision_index
         run: echo "new_index=$(git tag -l 'v${{steps.extract_version.outputs.version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" >> $GITHUB_OUTPUT && echo "$(<$GITHUB_OUTPUT)"
+
       - name: Print Revision Index #  | xargs echo
         if: inputs.channel != 'stable'
-        run: echo ${{steps.extract_version.outputs.version}}
+        run: echo "version => '${{steps.extract_version.outputs.version}}',\n'revision => ${{steps.get_revision_index.outputs.new_index }}"
+
       - name: Add Version Tag
         id: add_version_tag
         uses: Bullrich/commit-autotag@v1.0.1
@@ -76,8 +78,9 @@ jobs:
           tag-name: latest
           # Message of the tag to update
           tag-message: This tag marks the commit of the latest stable release.
+
       - name: Check Outputs
-        run: echo "${{ toJSON(steps.add_version_tag.outputs) }}"
+        run: echo "${{ toJSON(steps.add_version_tag.outputs) }}" && git tag -l
 
       - run: npm ci
       - run: npm version ${{ steps.add_version_tag.outputs.tagname }} --no-git-tag-version

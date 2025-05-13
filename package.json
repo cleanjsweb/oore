@@ -1,9 +1,9 @@
 {
 	"name": "@cleanweb/oore",
-	"version": "1.0.0",
-	"description": "A library of helpers for writing cleaner React function components.",
+	"version": "1.0.3",
+	"description": "A library of helpers for writing cleaner React function components with object-oriented patterns.",
 	"engines": {
-		"node": ">=18"
+		"node": ">=20"
 	},
 	"files": [
 		"build",
@@ -22,25 +22,26 @@
 		"./all": "./build/index.js"
 	},
 	"scripts": {
-		"prebuild": "rimraf ./build && npm run build:docs",
+		"prebuild": "rimraf ./build",
 		"build": "tsc && tsc-alias",
-		"serve-docs": "serve docs",
 		"postbuild": "copyfiles tsconfig.json build",
 		"build:docs": "typedoc",
 		"_": "",
+		"serve-docs": "serve docs",
+		"__": "",
 		"prepublishOnly": "npm run build",
 		"publish:patch": "npm version patch && npm publish",
 		"publish:minor": "npm version minor && npm publish",
 		"publish:major": "npm version major && npm publish",
-		"__": "/// Increment beta number for the current patch version. ///",
+		"___": "/// Increment beta number for the current patch version. ///",
 		"publish:beta:current": "npm version prerelease --preid beta && npm publish --tag beta",
-		"___": "/// Create a beta.0 for a new patch/minor/major version ///",
+		"____": "/// Create a beta.0 for a new patch/minor/major version ///",
 		"publish:beta:new-patch": "npm version prepatch --preid beta && npm publish --tag beta",
 		"publish:beta:new-minor": "npm version preminor --preid beta && npm publish --tag beta",
 		"publish:beta:new-major": "npm version premajor --preid beta && npm publish --tag beta",
-		"____": "",
+		"_____": "",
 		"//postpublish": "cd ./mirror-pkg && npm publish && cd ..",
-		"______": "",
+		"_______": "",
 		"test": "echo \"No tests ATM\""
 	},
 	"keywords": [
@@ -59,6 +60,8 @@
 		"name": "Feranmi Akinlade",
 		"url": "https://feranmi.dev"
 	},
+	"repository": "https://github.com/cleanjsweb/oore",
+	"homepage": "https://cleanjsweb.github.io/oore/",
 	"license": "MIT",
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.25.9",

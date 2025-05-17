@@ -1,5 +1,5 @@
 
-name: Publish Alpha Release for PRs
+name: Publish Alpha Release
 
 on:
   pull_request:

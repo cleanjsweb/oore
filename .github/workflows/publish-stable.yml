@@ -1,5 +1,5 @@
 
-name: Publish Stable Release From main Branch
+name: Publish Stable Release
 
 on:
   push:

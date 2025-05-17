@@ -1,5 +1,5 @@
 
-name: Publish Beta Release From beta Branch
+name: Publish Beta Release
 
 on:
   push:

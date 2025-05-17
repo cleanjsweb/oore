@@ -57,7 +57,7 @@ jobs:
           # -> Text which is applied to the end of the tag.
           tag_suffix: ${{ inputs.channel != 'stable' && format('-{0}.{1}', inputs.channel, steps.get_revision_index.outputs.new_index) }} # optional
           # -> This is the annotated commit message associated with the tag. By default, a changelog will be generated from the commits between the latest tag and the new tag (HEAD). This will override that with a hard-coded message.
-          # tag_message: # optional
+          tag_message: Version tag automatically added for published release. # optional
           # -> The commit message template (per commit). Default is `{{number}}) {{message}} ({{author}}) SHA: {{sha}}`
           # commit_message_template: # optional
           # -> Explicitly set the version here instead of automatically detecting from `package.json`. Useful for non-JavaScript projects where version may be output by a previous action.

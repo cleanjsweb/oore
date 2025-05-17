@@ -40,7 +40,7 @@ jobs:
 
       - name: Print Revision Index
         if: inputs.channel != 'stable'
-        run: echo "version => ${{steps.extract_version.outputs.version}} && echo "revision => ${{steps.get_revision_index.outputs.new_index }}"
+        run: echo "version => ${{steps.extract_version.outputs.version}}" && echo "revision => ${{steps.get_revision_index.outputs.new_index }}"
 
       - name: Add Version Tag
         id: add_version_tag

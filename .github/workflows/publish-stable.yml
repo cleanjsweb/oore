@@ -1,0 +1,25 @@
+
+name: Publish Stable Release
+
+on:
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  alpha-release:
+    uses: ./.github/workflows/publish-release.yml
+    with:
+      channel: stable
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # GITHUB_TOKEN: ${ { secrets.GITHUB_TOKEN }}
+

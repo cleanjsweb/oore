@@ -55,7 +55,7 @@ jobs:
           # -> By default, package.json uses semantic versioning, such as "1.0.0". A prefix can be used to add text before the tag name. For example, if tag_prefx is set to "v", then the tag would be labeled as "v1.0.0".
           tag_prefix: v # optional
           # -> Text which is applied to the end of the tag.
-          tag_suffix: ${{ inputs.channel != 'stable' && format('-{0}.{1}', inputs.channel, steps.get_revision_index.outputs.new_index) }} # optional
+          tag_suffix: ${{ inputs.channel == 'stable' && '' || format('-{0}.{1}', inputs.channel, steps.get_revision_index.outputs.new_index) }} # optional
           # -> This is the annotated commit message associated with the tag. By default, a changelog will be generated from the commits between the latest tag and the new tag (HEAD). This will override that with a hard-coded message.
           tag_message: Version tag automatically added for published release. # optional
           # -> The commit message template (per commit). Default is `{{number}}) {{message}} ({{author}}) SHA: {{sha}}`

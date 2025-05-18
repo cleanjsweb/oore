@@ -70,7 +70,7 @@ jobs:
       - name: Check current branch
         run: git branch && git tag -l
 
-      - run: git tag 'latest' --force && git push -f
+      - run: git tag 'latest' --force && git tag -l && git push origin latest -f
       # - name: Add "latest" Tag # 
       #   if: inputs.channel == 'stable'
       #   uses: weareyipyip/walking-tag-action@v2.0.0

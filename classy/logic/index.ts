@@ -63,7 +63,7 @@ export class ComponentLogic<TProps extends TPropsBase = null> {
 	 * It receives the initial `props` object and should return
 	 * an object with the initial values for your component's state.
 	 */
-	getInitialState = (props?: TProps extends null ? undefined : TProps): object => ({});
+	getInitialState = (props: TProps extends null ? undefined : TProps): object => ({});
 
 	/**
 	 * Call React hooks from here. If your component needs

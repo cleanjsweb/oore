@@ -1,7 +1,10 @@
 
 import type { Dispatch, SetStateAction } from 'react';
+import type { useMergedState } from '../merged-state';
+
+import type { ICleanStateClass, ICleanStateConstructor, PutManyPayload, PutState } from './class-types';
+
 import { useState } from 'react';
-import { ICleanStateClass, ICleanStateConstructor, PutManyPayload, PutState } from './class-types';
 
 /** @internal */
 export class CleanStateBase<TState extends Record<string, any>> {
@@ -79,7 +82,59 @@ export class CleanStateBase<TState extends Record<string, any>> {
 		return { ...this._initialValues_ };
 	}
 
-	// readonly putMany = (newValues: Partial<TState>) => {
+	/**
+	 * Accepts an object to be merged into the current state object,
+	 * updating the values of specified keys to their specified values.
+	 * 
+	 * All specified keys must be present on the initial state object.
+	 * This is a requirement of React hooks, as the number of calls to
+	 * useState must be the same throughout a component's lifetime.
+	 * 
+	 * To dynamically add new keys to your state object, use a nested object,
+	 * or use the {@link useMergedState | `useMergedState`} hook also exported by this library.
+	 * 
+	 * When called from inside a component class, the type of the object passed
+	 * must be explicitly specified with a type assertion.
+	 * This is because the component classes use the dynamic `this` type to define
+	 * the type of their state property.
+	 * 
+	 * Use the `StateFragment` type, also aliased as `SF`, to define this type assertion.
+	 * The assertion is not needed when calling putMany from outside the class.
+	 * 
+	 * @example <caption>Using `putMany`</caption>
+	 * import type { SF } from '@cleanweb/oore/base';
+	 * import { ComponentLogic } from '@cleanweb/oore';
+	 * 
+	 * class InputCL extends ComponentLogic<TProps> {
+	 *     getInitialState(props: TProps): TState => ({
+	 *         disabled: true,
+	 *     });
+	 * 
+	 *     enableInput = () => {
+	 *         this.state.putMany({
+	 *             disabled: false,
+	 *         } as SF<this>); // Type assertion required inside class.
+	 *     };
+	 * }
+	 * 
+	 * export const Input = (props: TProps) => {
+	 *     const self = useLogic(InputCL, props);
+	 * 
+	 *     return <>
+	 *         {
+	 *             // Other elements...
+	 *         }
+	 *         <button className="cta"
+	 *                 onClick={() => {
+	 *                     self.state.putMany({
+	 *                         disabled: true
+	 *                     }); // No type assertion needed outside the class.
+	 *                 }}>
+	 *             Submit
+	 *         </button>
+	 *     </>;
+	 * };
+	 */
 	readonly putMany = (newValues: PutManyPayload<TState>) => {
 		type StateKey = keyof TState;
 		type StateValue = TState[StateKey];

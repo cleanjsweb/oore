@@ -71,23 +71,14 @@ jobs:
         run: git branch && git tag -l
 
       - run: git tag 'latest' --force && git tag -l && git push origin latest -f
-      # - name: Add "latest" Tag # 
-      #   if: inputs.channel == 'stable'
-      #   uses: weareyipyip/walking-tag-action@v2.0.0
-      #   with:
-      #     # -> Name of the tag to update
-      #     tag-name: latest
-      #     # -> Message of the tag to update
-      #     tag-message: This tag marks the commit of the latest stable release.
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check Outputs
         run: echo "${{ toJSON(steps.add_version_tag.outputs) }}" && git tag -l
 
       - run: npm ci
       - run: npm version ${{ steps.add_version_tag.outputs.tagname }} --no-git-tag-version
-      - run: npm publish --tag ${{ inputs.channel }}
+        if: inputs.channel != 'stable'
+      - run: npm publish ${{ inputs.channel != 'stable' && format('{0} {1}', '--tag', inputs.channel) || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

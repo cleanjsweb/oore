@@ -72,7 +72,7 @@ class MergedState<TState extends object> {
 
 /**
  * Similar to {@link useCleanState},
- * but uses a single `useState` call for the entire object.
+ * but uses a single `useState` call for the entire state object.
  */
 export const useMergedState = <TState extends object>(initialState: TState) => {
 	const cleanState = useRef(

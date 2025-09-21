@@ -10,15 +10,11 @@
 		".npmrc"
 	],
 	"main": "build/index.js",
-	"//exports/.": {
-		"require": "./src/index.cjs",
-		"import": "./src/index.mjs"
-	},
-	"//type": "module",
 	"exports": {
 		".": "./build/classy/index.js",
 		"./base": "./build/base/index.js",
 		"./helpers": "./build/helpers/index.js",
+		"./slots": "./build/slots/index.js",
 		"./all": "./build/index.js"
 	},
 	"scripts": {

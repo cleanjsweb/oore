@@ -26,7 +26,8 @@ export type SlotComponent<
 
 export interface SlottedComponent<
 		TProps = any,
-		TSlotsRecordArg extends TSlotsRecord = TSlotsRecord> {
+		TSlotAliasArg extends TSlotAlias = TSlotAlias, 
+		TSlotsRecordArg extends TSlotsRecord<TSlotAliasArg> = TSlotsRecord<TSlotAliasArg>> {
 	(props: TProps): ReactNode;
 	Slots: TSlotsRecordArg;
 }

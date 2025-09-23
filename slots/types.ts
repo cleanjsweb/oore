@@ -15,9 +15,9 @@ export interface DisplayNamedComponent<
 	TProps extends any = any
 > extends FunctionComponent<TProps> { displayName: string };
 
-export interface SlotNamedComponent<TProps extends any = any> {
+export interface SlotNamedComponent<TProps extends any = any, TSlotNameArg extends TSlotName = TSlotName> {
 	(props: TProps): ReactNode;
-	slotName: TSlotName;
+	slotName: TSlotNameArg;
 };
 
 export type SlotComponent<

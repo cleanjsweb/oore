@@ -12,7 +12,12 @@ export const isElementChild = (child: ReactNode): child is ReactElement<any, any
 	return false;
 };
 
-export const getComponentSlotName = (TargetComponent: PotentialSlotComponent) => {
+
+interface IGetSlotName {
+	(TargetComponent: PotentialSlotComponent, child?: ReactElement): string | undefined;
+}
+
+export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 	if (typeof TargetComponent === 'string') {
 		return TargetComponent;
 	}
@@ -21,6 +26,16 @@ export const getComponentSlotName = (TargetComponent: PotentialSlotComponent) =>
 	}
 	else if ('displayName' in TargetComponent) {
 		return TargetComponent.displayName;
+	}
+	else if (child) {
+		const keyTypes = ['string', 'number', 'symbol'];
+		const slotName = child.props['data-slot-name'];
+
+		if (keyTypes.includes(typeof slotName)) {
+			return slotName;
+		}
+
+		else return undefined;
 	}
 	else return undefined;
 };
@@ -81,8 +96,7 @@ export const useSlots: IUseSlots = (children, slotComponents) => {
 			}
 
 			const slotAlias = (() => {
-				const ChildComponent = child.type;
-				const slotName = getComponentSlotName(ChildComponent);
+				const slotName = getComponentSlotName(child.type, child);
 
 				return slotName ? slotsAliasLookup[slotName] : null;
 			})();

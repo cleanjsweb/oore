@@ -11,9 +11,10 @@ export type TSlotsRecord<TKey extends TSlotAlias = TSlotAlias> = {
 	[Key in TKey]: (string | SlotComponent);
 };
 
-export interface DisplayNamedComponent<
-	TProps extends any = any
-> extends FunctionComponent<TProps> { displayName: string };
+export type DisplayNamedComponent<
+	TComponentArg extends TComponent = TComponent,
+	TDisplayNameArg extends string = string
+> = TComponentArg & { displayName: TDisplayNameArg };
 
 export type SlotNamedComponent<
 	TComponentArg extends TComponent = TComponent,
@@ -21,8 +22,8 @@ export type SlotNamedComponent<
 > = TComponentArg & { slotName: TSlotNameArg };
 
 export type SlotComponent<
-	Component extends TComponent = TComponent
-> = SlotNamedComponent | DisplayNamedComponent<Component>;
+	TComponentArg extends TComponent = TComponent
+> = SlotNamedComponent<TComponentArg> | DisplayNamedComponent<TComponentArg>;
 
 export type SlottedComponent<
 	TComponentArg extends TComponent = TComponent,

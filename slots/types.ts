@@ -24,13 +24,11 @@ export type SlotComponent<
 	Component extends TComponent = TComponent
 > = SlotNamedComponent | DisplayNamedComponent<Component>;
 
-export interface SlottedComponent<
-		TProps = any,
-		TSlotAliasArg extends TSlotAlias = TSlotAlias, 
-		TSlotsRecordArg extends TSlotsRecord<TSlotAliasArg> = TSlotsRecord<TSlotAliasArg>> {
-	(props: TProps): ReactNode;
-	Slots: TSlotsRecordArg;
-}
+export type SlottedComponent<
+	TComponentArg extends (props: unknown) => ReactNode,
+	TSlotAliasArg extends TSlotAlias = TSlotAlias, 
+	TSlotsRecordArg extends TSlotsRecord<TSlotAliasArg> = TSlotsRecord<TSlotAliasArg>
+> = TComponentArg & { Slots: TSlotsRecordArg };
 
 export type TSlotNodes<TSlotAliasArg extends TSlotAlias> = {
 	[Key in TSlotAliasArg]?: ReactElement<any>;

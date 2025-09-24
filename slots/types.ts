@@ -8,7 +8,7 @@ export type TSlotName = keyof any;
 export type TSlotAlias = keyof any;
 
 export type TSlotsRecord<TKey extends TSlotAlias = TSlotAlias> = {
-	[Key in TKey]: (string | SlotComponent);
+	[Key in TKey]: string | SlotComponent;
 };
 
 export type DisplayNamedComponent<
@@ -21,9 +21,10 @@ export type SlotNamedComponent<
 	TSlotNameArg extends TSlotName = TSlotName
 > = TComponentArg & { slotName: TSlotNameArg };
 
-export type SlotComponent<
-	TComponentArg extends TComponent = TComponent
-> = SlotNamedComponent<TComponentArg> | DisplayNamedComponent<TComponentArg>;
+export type SlotComponent<TComponentArg extends TComponent = TComponent> = (
+	SlotNamedComponent<TComponentArg> 
+	| DisplayNamedComponent<TComponentArg>
+) & { isRequiredSlot?: boolean };
 
 export type SlottedComponent<
 	TComponentArg extends TComponent = TComponent,
@@ -45,6 +46,7 @@ export interface IUseSlots {
 	<TSlotAliasArg extends TSlotAlias = TSlotAlias>(
 		children: ReactNode,
 		slotComponents: TSlotsRecord<TSlotAliasArg>,
+		requiredSlots?: TSlotAliasArg[],
 	): TUseSlotsResult<TSlotAliasArg>;
 }
 

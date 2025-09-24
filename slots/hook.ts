@@ -40,7 +40,7 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 	else return undefined;
 };
 
-export const useSlots: IUseSlots = (children, slotComponents) => {
+export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) => {
 	type TSlotsRecordArg = typeof slotComponents;
 
 	type TSlotAliasArg = keyof TSlotsRecordArg;
@@ -77,6 +77,7 @@ export const useSlots: IUseSlots = (children, slotComponents) => {
 		const slotNodes: TSlotNodesArg = {};
 		const unmatchedChildren: ReactNode[] = [];
 		const invalidChildren: any[] = [];
+		const requiredSlots = [...(_requiredSlots ?? [])];
 
 		React.Children.forEach(children, (child) => {
 			if (!child) {
@@ -103,11 +104,24 @@ export const useSlots: IUseSlots = (children, slotComponents) => {
 
 			console.log('match:', { key: slotAlias });
 
+			if (slotAlias && (typeof slotComponents[slotAlias] !== 'string')) {
+				if (slotComponents[slotAlias].isRequiredSlot) {
+					requiredSlots.push(slotAlias);
+				}
+			}
+
 			if (slotAlias) slotNodes[slotAlias] = child;
 			else unmatchedChildren.push(child);
 		});
 
 		console.log({ unmatchedChildren, invalidChildren });
+
+		requiredSlots.forEach((slotAlias) => {
+			if (!slotNodes[slotAlias]) {
+				throwDevError(`Missing required slot "${String(slotAlias)}".`);
+			}
+		});
+
 		return [slotNodes, unmatchedChildren, invalidChildren] as const;
 	}, [children]);
 

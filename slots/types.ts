@@ -15,17 +15,17 @@ export interface DisplayNamedComponent<
 	TProps extends any = any
 > extends FunctionComponent<TProps> { displayName: string };
 
-export interface SlotNamedComponent<TProps extends any = any, TSlotNameArg extends TSlotName = TSlotName> {
-	(props: TProps): ReactNode;
-	slotName: TSlotNameArg;
-};
+export type SlotNamedComponent<
+	TComponentArg extends TComponent = TComponent,
+	TSlotNameArg extends TSlotName = TSlotName
+> = TComponentArg & { slotName: TSlotNameArg };
 
 export type SlotComponent<
 	Component extends TComponent = TComponent
 > = SlotNamedComponent | DisplayNamedComponent<Component>;
 
 export type SlottedComponent<
-	TComponentArg extends (props: unknown) => ReactNode,
+	TComponentArg extends TComponent = TComponent,
 	TSlotAliasArg extends TSlotAlias = TSlotAlias, 
 	TSlotsRecordArg extends TSlotsRecord<TSlotAliasArg> = TSlotsRecord<TSlotAliasArg>
 > = TComponentArg & { Slots: TSlotsRecordArg };

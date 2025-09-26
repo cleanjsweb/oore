@@ -32,6 +32,9 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 		const slotName = child.props['data-slot-name'];
 
 		if (keyTypes.includes(typeof slotName)) {
+			if (typeof child.type === 'string') {
+				child.props.tagName = child.type;
+			}
 			return slotName;
 		}
 
@@ -49,8 +52,6 @@ export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) =>
 	type TSlotNodesArg = TSlotNodes<TSlotAliasArg>;
 
 	const { useMemo } = React;
-
-	console.log({ slotComponents });
 
 	const slotsAliasLookup = useMemo(() => {
 		type TEntries = Array<[TSlotAliasArg, TSlotComponentArg]>;
@@ -70,8 +71,6 @@ export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) =>
 
 		return aliasLookup;
 	}, [slotComponents]);
-
-	console.log({ slotsAliasLookup });
 
 	const result = useMemo(() => {
 		const slotNodes: TSlotNodesArg = {};
@@ -113,8 +112,6 @@ export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) =>
 			if (slotAlias) slotNodes[slotAlias] = child;
 			else unmatchedChildren.push(child);
 		});
-
-		console.log({ unmatchedChildren, invalidChildren });
 
 		requiredSlots.forEach((slotAlias) => {
 			if (!slotNodes[slotAlias]) {

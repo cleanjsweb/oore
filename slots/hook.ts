@@ -101,8 +101,6 @@ export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) =>
 				return slotName ? slotsAliasLookup[slotName] : null;
 			})();
 
-			console.log('match:', { key: slotAlias });
-
 			if (slotAlias && (typeof slotComponents[slotAlias] !== 'string')) {
 				if (slotComponents[slotAlias].isRequiredSlot) {
 					requiredSlots.push(slotAlias);

@@ -55,9 +55,9 @@ jobs:
           # -> By default, package.json uses semantic versioning, such as "1.0.0". A prefix can be used to add text before the tag name. For example, if tag_prefx is set to "v", then the tag would be labeled as "v1.0.0".
           tag_prefix: v # optional
           # -> Text which is applied to the end of the tag.
-          tag_suffix: ${{ inputs.channel != 'stable' && format('-{0}.{1}', inputs.channel, steps.get_revision_index.outputs.new_index) }} # optional
+          tag_suffix: ${{ inputs.channel != 'stable' && format('-{0}.{1}', inputs.channel, steps.get_revision_index.outputs.new_index) || '' }} # optional
           # -> This is the annotated commit message associated with the tag. By default, a changelog will be generated from the commits between the latest tag and the new tag (HEAD). This will override that with a hard-coded message.
-          # tag_message: # optional
+          tag_message: Version tag automatically added for published release. # optional
           # -> The commit message template (per commit). Default is `{{number}}) {{message}} ({{author}}) SHA: {{sha}}`
           # commit_message_template: # optional
           # -> Explicitly set the version here instead of automatically detecting from `package.json`. Useful for non-JavaScript projects where version may be output by a previous action.
@@ -70,21 +70,23 @@ jobs:
       - name: Check current branch
         run: git branch && git tag -l
 
-      - name: Add "latest" Tag # git tag 'latest' --force
-        if: inputs.channel == 'stable'
-        uses: weareyipyip/walking-tag-action@v2.0.0
-        with:
-          # -> Name of the tag to update
-          tag-name: latest
-          # -> Message of the tag to update
-          tag-message: This tag marks the commit of the latest stable release.
+      # - name: Add "latest" Tag # git tag 'latest' --force
+      #   if: inputs.channel == 'stable'
+      #   uses: weareyipyip/walking-tag-action@v2.0.0
+      #   with:
+      #     # -> Name of the tag to update
+      #     tag-name: latest
+      #     # -> Message of the tag to update
+      #     tag-message: This tag marks the commit of the latest stable release.
+      - run: git tag 'latest' --force && git tag -l && git push origin latest -f
 
       - name: Check Outputs
         run: echo "${{ toJSON(steps.add_version_tag.outputs) }}" && git tag -l
 
       - run: npm ci
       - run: npm version ${{ steps.add_version_tag.outputs.tagname }} --no-git-tag-version
-      - run: npm publish --tag ${{ inputs.channel }}
+        if: inputs.channel != 'stable'
+      - run: npm publish ${{ inputs.channel != 'stable' && format('{0} {1}', '--tag', inputs.channel) || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

@@ -70,6 +70,14 @@ jobs:
       - name: Check current branch
         run: git branch && git tag -l
 
+      # - name: Add "latest" Tag # git tag 'latest' --force
+      #   if: inputs.channel == 'stable'
+      #   uses: weareyipyip/walking-tag-action@v2.0.0
+      #   with:
+      #     # -> Name of the tag to update
+      #     tag-name: latest
+      #     # -> Message of the tag to update
+      #     tag-message: This tag marks the commit of the latest stable release.
       - run: git tag 'latest' --force && git tag -l && git push origin latest -f
 
       - name: Check Outputs

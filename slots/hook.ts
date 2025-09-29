@@ -18,16 +18,7 @@ interface IGetSlotName {
 }
 
 export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
-	if (typeof TargetComponent === 'string') {
-		return TargetComponent;
-	}
-	else if ('slotName' in TargetComponent) {
-		return TargetComponent.slotName;
-	}
-	else if ('displayName' in TargetComponent) {
-		return TargetComponent.displayName;
-	}
-	else if (child) {
+	if (child) {
 		const keyTypes = ['string', 'number', 'symbol'];
 		const slotName = child.props['data-slot-name'];
 
@@ -37,10 +28,17 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 			}
 			return slotName;
 		}
-
-		else return undefined;
 	}
-	else return undefined;
+
+	if (typeof TargetComponent === 'string') {
+		return TargetComponent;
+	} else if ('slotName' in TargetComponent) {
+		return TargetComponent.slotName;
+	} else if ('displayName' in TargetComponent) {
+		return TargetComponent.displayName;
+	}
+
+	return undefined;
 };
 
 export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) => {

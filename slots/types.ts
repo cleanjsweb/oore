@@ -33,7 +33,7 @@ export type SlottedComponent<
 > = TComponentArg & { Slots: TSlotsRecordArg };
 
 export type TSlotNodes<TSlotAliasArg extends TSlotAlias> = {
-	[Key in TSlotAliasArg]?: ReactElement<any>;
+	[Key in TSlotAliasArg]?: ReactElement<any> | Array<ReactElement<any>>;
 };
 
 export type TUseSlotsResult<TSlotAliasArg extends TSlotAlias = TSlotAlias> = Readonly<[

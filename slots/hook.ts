@@ -105,7 +105,17 @@ export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) =>
 				}
 			}
 
-			if (slotAlias) slotNodes[slotAlias] = child;
+			if (slotAlias) {
+				if (!slotNodes[slotAlias]) {
+					slotNodes[slotAlias] = child;
+				}
+				else if (Array.isArray(slotNodes[slotAlias])) {
+					slotNodes[slotAlias].push(child);
+				}
+				else {
+					slotNodes[slotAlias] = [slotNodes[slotAlias], child];
+				}
+			}
 			else unmatchedChildren.push(child);
 		});
 

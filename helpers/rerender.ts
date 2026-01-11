@@ -2,22 +2,27 @@ import { useCallback, useRef, useState } from 'react';
 import { useMountState } from '@/helpers/mount-state';
 
 
-type TCountRef = { current: number };
+interface ICountRef {
+	current: number,
+};
 
-interface IRefreshFunction {
-	(): Promise<{
-		/** The last render count just before the rerender was triggered. */
-		previousCount: number,
-		/** A {@link useRef | RefObject} whose `current` property always has the latest render count. */
-		latestCountRef: TCountRef,
-	}>;
-	/** The number of times this instance of the component has been (re)rendered. */
-	currentCount?: number;
+interface IRefresherReturn {
+	/** The last render count just before the rerender was triggered. */
+	previousCount: number,
+	/** A {@link useRef | RefObject} whose `current` property always has the latest render count. */
+	latestCountRef: ICountRef,
 }
 
-interface IRefresher extends Omit<IRefreshFunction, 'currentCount'> {
-	/** The number of times this instance of the component has been (re)rendered. */
-	currentCount: number;
+interface IRefresher {
+	(): Promise<IRefresherReturn>;
+}
+
+interface IUseRender {
+	(): IRefresher & {
+		// (): Promise<IRefresherReturn>;
+		/** The number of times this instance of the component has been (re)rendered. */
+		currentCount: number;
+	}
 }
 
 
@@ -25,7 +30,7 @@ interface IRefresher extends Omit<IRefreshFunction, 'currentCount'> {
  * Returns a function that can be called to manually trigger
  * a rerender of your component.
  */
-export const useRerender = () => {
+export const useRerender: IUseRender = () => {
 	const isMounted = useMountState();
 
 	const renderCount = useRef(0);
@@ -33,8 +38,8 @@ export const useRerender = () => {
 
 	renderCount.current++;
 
-	const rerender = useCallback<IRefreshFunction>(() => {
-		type TReturn = Awaited<ReturnType<IRefreshFunction>>;
+	const rerender = useCallback<IRefresher>(() => {
+		type TReturn = Awaited<ReturnType<IRefresher>>;
 		
 		let resolve: (value: TReturn) => void;
 		const promise = new Promise<TReturn>((_r) => resolve = _r);
@@ -58,8 +63,8 @@ export const useRerender = () => {
 		return promise;
 	}, [forceRerender, renderCount]);
 
-	rerender.currentCount = renderCount.current;
+	const refresher = () => rerender();
+	refresher.currentCount = renderCount.current;
 
-	const output = rerender as IRefresher;
-	return output;
+	return refresher;
 };

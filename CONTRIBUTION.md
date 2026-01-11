@@ -39,10 +39,10 @@ The `type` should be one of:
 - `chore` - For changes that don't impact the library's runtime, e.g updating docs or pipeline scripts.
 
 #### Initials
-The `ownerInitials` should sustituted with 2 or 3 letter long string representing the author's initials.
+The `ownerInitials` should substituted with a 2 or 3 letter long string representing the author's initials.
 
 #### Example
-If a contributor named John Doe wanted to use a feature branch to contribute a fix for a hypothetical bug that caused crashes on Safari, the branch name should be something like:
+If a contributor named John Doe wanted to use a feature branch to contribute a fix for a hypothetical bug that caused crashes on Safari, the branch name would be something like:
 
 ```
 fix/jd-safari-crash

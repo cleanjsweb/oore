@@ -41,7 +41,7 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 	return undefined;
 };
 
-export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) => {
+export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliases) => {
 	type TSlotsRecordArg = typeof slotComponents;
 
 	type TSlotAliasArg = keyof TSlotsRecordArg;
@@ -64,7 +64,7 @@ export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) =>
 				throwDevError(`A registered slot component did not have a slot name. All components registered as slots must either be a string tag-name or a React component with either "slotName" or "displayName". The affected component was: ${RegisteredSlotComponent}`);
 				return;
 			}
-			return aliasLookup[slotName] = alias;
+			aliasLookup[slotName] = alias;
 		});
 
 		return aliasLookup;
@@ -74,7 +74,7 @@ export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) =>
 		const slotNodes: TSlotNodesArg = {};
 		const unmatchedChildren: ReactNode[] = [];
 		const invalidChildren: any[] = [];
-		const requiredSlots = [...(_requiredSlots ?? [])];
+		const cachedRequiredSlotAliases = [...(requiredSlotAliases ?? [])];
 
 		React.Children.forEach(children, (child) => {
 			if (!child) {
@@ -101,15 +101,25 @@ export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) =>
 
 			if (slotAlias && (typeof slotComponents[slotAlias] !== 'string')) {
 				if (slotComponents[slotAlias].isRequiredSlot) {
-					requiredSlots.push(slotAlias);
+					cachedRequiredSlotAliases.push(slotAlias);
 				}
 			}
 
-			if (slotAlias) slotNodes[slotAlias] = child;
+			if (slotAlias) {
+				if (!slotNodes[slotAlias]) {
+					slotNodes[slotAlias] = child;
+				}
+				else if (Array.isArray(slotNodes[slotAlias])) {
+					slotNodes[slotAlias].push(child);
+				}
+				else {
+					slotNodes[slotAlias] = [slotNodes[slotAlias], child];
+				}
+			}
 			else unmatchedChildren.push(child);
 		});
 
-		requiredSlots.forEach((slotAlias) => {
+		cachedRequiredSlotAliases.forEach((slotAlias) => {
 			if (!slotNodes[slotAlias]) {
 				throwDevError(`Missing required slot "${String(slotAlias)}".`);
 			}

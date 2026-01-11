@@ -9,13 +9,13 @@
 
 ## Releases
 ### `alpha`
-When a PR is made to the `beta` branch, an `alpha` release is automatically published each time a commit is pushed to the PR.
+When a PR is made to the `beta` branch, an `alpha` release is automatically published each time a commit is pushed to the PR. Once the PR is merged into the `beta` branch, the source branch will be deleted automatically. Merges into `beta` are squashed, so deleting the source branch is ideal to prevent conflicts.
 
 ### `beta`
 Once merged, a `beta` release is published from the `beta` branch.
 
 ### Stable versions
-Changes from the `beta` branch will periodically be merged into the `stable` branch once they are tested and confirmed stable. Changes to the `stable` branch are automatically published to npm as stable releases with the tag `latest`.
+Changes from the `beta` branch will periodically be merged (fast-forward) into the `stable` branch once they are tested and confirmed stable. Changes to the `stable` branch are automatically published to npm as stable releases with the tag `latest`.
 
 An intermediate commit from `beta` may be merged into `stable` if newer commits have known bugs that are yet to be fixed.
 

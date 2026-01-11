@@ -88,7 +88,9 @@ jobs:
       - run: npm ci
       - run: npm version ${{ steps.add_version_tag.outputs.tagname }} --no-git-tag-version
         if: inputs.channel != 'stable'
-      - run: npm publish ${{ inputs.channel != 'stable' && format('{0} {1}', '--tag', inputs.channel) || '' }}
+
+      - run: npm publish --tag ${{ inputs.channel != 'stable' && inputs.channel || 'latest' }}
+        # format('{0} {1}', '', inputs.channel)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

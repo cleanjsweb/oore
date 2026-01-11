@@ -1,5 +1,24 @@
+import { useCallback, useRef, useState } from 'react';
 import { useMountState } from '@/helpers/mount-state';
-import { useCallback, useState } from 'react';
+
+
+type TCountRef = { current: number };
+
+interface IRefreshFunction {
+	(): Promise<{
+		/** The last render count just before the rerender was triggered. */
+		previousCount: number,
+		/** A {@link useRef | RefObject} whose `current` property always has the latest render count. */
+		latestCountRef: TCountRef,
+	}>;
+	/** The number of times this instance of the component has been (re)rendered. */
+	currentCount?: number;
+}
+
+interface IRefresher extends Omit<IRefreshFunction, 'currentCount'> {
+	/** The number of times this instance of the component has been (re)rendered. */
+	currentCount: number;
+}
 
 
 /**
@@ -9,33 +28,38 @@ import { useCallback, useState } from 'react';
 export const useRerender = () => {
 	const isMounted = useMountState();
 
-	const [key, forceRerender] = useState(Date.now());
+	const renderCount = useRef(0);
+	const [, forceRerender] = useState(renderCount.current);
 
-	const rerender = useCallback(() => new Promise((resolve, reject) => {
+	renderCount.current++;
+
+	const rerender = useCallback<IRefreshFunction>(() => {
+		type TReturn = Awaited<ReturnType<IRefreshFunction>>;
+		
+		let resolve: (value: TReturn) => void;
+		const promise = new Promise<TReturn>((_r) => resolve = _r);
+
 		const execute = () => {
-			const key = Date.now();
-			forceRerender(key);
-			resolve(key);
+			forceRerender(renderCount.current);
+			resolve({
+				previousCount: renderCount.current,
+				latestCountRef: renderCount,
+			});
 		}
 
-		if (isMounted()) {
-			execute();
-			return;
+		if (isMounted()) execute();
+		else {
+			setTimeout(() => {
+				if (isMounted()) execute();
+				else console.log('Cannot rerender an unmounted component.');
+			}, 1000);
 		}
 
-		setTimeout(() => {
-			if (isMounted()) {
-				execute();
-				return;
-			}
-			else {
-				console.log('Cannot rerender an unmounted component.');
-			}
-		}, 1000);
-	}), [forceRerender]);
+		return promise;
+	}, [forceRerender, renderCount]);
 
-	// @ts-expect-error
-	rerender.key = key;
+	rerender.currentCount = renderCount.current;
 
-	return rerender;
+	const output = rerender as IRefresher;
+	return output;
 };

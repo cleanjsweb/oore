@@ -102,7 +102,7 @@ export type SlottedComponent<
  * to be rendered for that slot.
  */
 export type TSlotNodes<TSlotAliasArg extends TSlotAlias> = {
-	[Key in TSlotAliasArg]?: ReactElement<any> | Array<ReactElement<any>>;
+	[Key in TSlotAliasArg]?: Array<ReactElement<any>>;
 };
 
 export type TUseSlotsResult<TSlotAliasArg extends TSlotAlias = TSlotAlias> = Readonly<[

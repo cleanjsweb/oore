@@ -114,14 +114,10 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 			}
 
 			if (slotAlias) {
-				if (!slotNodes[slotAlias]) {
-					slotNodes[slotAlias] = child;
-				}
-				else if (Array.isArray(slotNodes[slotAlias])) {
+				if (slotNodes[slotAlias]) {
 					slotNodes[slotAlias].push(child);
-				}
-				else {
-					slotNodes[slotAlias] = [slotNodes[slotAlias], child];
+				} else {
+					slotNodes[slotAlias] = [child];
 				}
 			}
 			else unmatchedChildren.push(child);

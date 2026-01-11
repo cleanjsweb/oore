@@ -46,7 +46,7 @@ export interface IUseSlots {
 	<TSlotAliasArg extends TSlotAlias = TSlotAlias>(
 		children: ReactNode,
 		slotComponents: TSlotsRecord<TSlotAliasArg>,
-		requiredSlotAliases?: TSlotAliasArg[],
+		requiredSlots?: TSlotAliasArg[],
 	): TUseSlotsResult<TSlotAliasArg>;
 }
 

@@ -41,7 +41,7 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 	return undefined;
 };
 
-export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliases) => {
+export const useSlots: IUseSlots = (children, slotComponents, _requiredSlots) => {
 	type TSlotsRecordArg = typeof slotComponents;
 
 	type TSlotAliasArg = keyof TSlotsRecordArg;
@@ -64,7 +64,7 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 				throwDevError(`A registered slot component did not have a slot name. All components registered as slots must either be a string tag-name or a React component with either "slotName" or "displayName". The affected component was: ${RegisteredSlotComponent}`);
 				return;
 			}
-			aliasLookup[slotName] = alias;
+			return aliasLookup[slotName] = alias;
 		});
 
 		return aliasLookup;
@@ -74,7 +74,7 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 		const slotNodes: TSlotNodesArg = {};
 		const unmatchedChildren: ReactNode[] = [];
 		const invalidChildren: any[] = [];
-		const cachedRequiredSlotAliases = [...(requiredSlotAliases ?? [])];
+		const requiredSlots = [...(_requiredSlots ?? [])];
 
 		React.Children.forEach(children, (child) => {
 			if (!child) {
@@ -101,7 +101,7 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 
 			if (slotAlias && (typeof slotComponents[slotAlias] !== 'string')) {
 				if (slotComponents[slotAlias].isRequiredSlot) {
-					cachedRequiredSlotAliases.push(slotAlias);
+					requiredSlots.push(slotAlias);
 				}
 			}
 
@@ -109,7 +109,7 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 			else unmatchedChildren.push(child);
 		});
 
-		cachedRequiredSlotAliases.forEach((slotAlias) => {
+		requiredSlots.forEach((slotAlias) => {
 			if (!slotNodes[slotAlias]) {
 				throwDevError(`Missing required slot "${String(slotAlias)}".`);
 			}

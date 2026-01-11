@@ -1,8 +1,8 @@
 import type { ReactElement, ReactNode } from 'react';
-import type { IUseSlots, PotentialSlotComponent, TSlotName, TSlotNodes } from './types';
+import type { IUseSlots, PotentialSlotComponent, SlotComponent, TSlotName, TSlotNodes, TUseSlotsResult } from './types';
 
 import { throwDevError } from '@/helpers/errors';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 
 export const isElementChild = (child: ReactNode): child is ReactElement<any, any> => {
@@ -41,6 +41,16 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 	return undefined;
 };
 
+/**
+ * Groups `children` prop into predefined slots.
+ * 
+ * @returns A {@link TUseSlotsResult} array,
+ * which includes a `slotNodes` object that maps the keys from
+ * the predefined {@link slotComponents} object to the corresponding
+ * React node(s) that were rendered for that slot.
+ * 
+ * @see {@link SlotComponent} for more on how to use the returned slot nodes.
+ */
 export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliases) => {
 	type TSlotsRecordArg = typeof slotComponents;
 
@@ -48,8 +58,6 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 	type TSlotComponentArg = valueof<TSlotsRecordArg>;
 
 	type TSlotNodesArg = TSlotNodes<TSlotAliasArg>;
-
-	const { useMemo } = React;
 
 	const slotsAliasLookup = useMemo(() => {
 		type TEntries = Array<[TSlotAliasArg, TSlotComponentArg]>;
@@ -106,14 +114,10 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 			}
 
 			if (slotAlias) {
-				if (!slotNodes[slotAlias]) {
-					slotNodes[slotAlias] = child;
-				}
-				else if (Array.isArray(slotNodes[slotAlias])) {
+				if (slotNodes[slotAlias]) {
 					slotNodes[slotAlias].push(child);
-				}
-				else {
-					slotNodes[slotAlias] = [slotNodes[slotAlias], child];
+				} else {
+					slotNodes[slotAlias] = [child];
 				}
 			}
 			else unmatchedChildren.push(child);

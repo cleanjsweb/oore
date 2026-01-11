@@ -1,5 +1,24 @@
+import { useCallback, useRef, useState } from 'react';
 import { useMountState } from '@/helpers/mount-state';
-import { useState } from 'react';
+
+
+type TCountRef = { current: number };
+
+interface IRefreshFunction {
+	(): Promise<{
+		/** The last render count just before the rerender was triggered. */
+		previousCount: number,
+		/** A {@link useRef | RefObject} whose `current` property always has the latest render count. */
+		latestCountRef: TCountRef,
+	}>;
+	/** The number of times this instance of the component has been (re)rendered. */
+	currentCount?: number;
+}
+
+interface IRefresher extends Omit<IRefreshFunction, 'currentCount'> {
+	/** The number of times this instance of the component has been (re)rendered. */
+	currentCount: number;
+}
 
 
 /**
@@ -9,22 +28,38 @@ import { useState } from 'react';
 export const useRerender = () => {
 	const isMounted = useMountState();
 
-	// Skip the value, we don't need it. Grab just the setter function.
-	const [, _forceRerender] = useState(Date.now());
+	const renderCount = useRef(0);
+	const [, forceRerender] = useState(renderCount.current);
 
-	const rerender = () => {
-		if (isMounted()) {
-			_forceRerender(Date.now());
-			return;
+	renderCount.current++;
+
+	const rerender = useCallback<IRefreshFunction>(() => {
+		type TReturn = Awaited<ReturnType<IRefreshFunction>>;
+		
+		let resolve: (value: TReturn) => void;
+		const promise = new Promise<TReturn>((_r) => resolve = _r);
+
+		const execute = () => {
+			forceRerender(renderCount.current);
+			resolve({
+				previousCount: renderCount.current,
+				latestCountRef: renderCount,
+			});
 		}
 
-		setTimeout(() => {
-			if (isMounted()) _forceRerender(Date.now());
-			else {
-				console.log('Cannot rerender an unmounted component.');
-			}
-		}, 1000);
-	}
+		if (isMounted()) execute();
+		else {
+			setTimeout(() => {
+				if (isMounted()) execute();
+				else console.log('Cannot rerender an unmounted component.');
+			}, 1000);
+		}
 
-	return rerender;
+		return promise;
+	}, [forceRerender, renderCount]);
+
+	rerender.currentCount = renderCount.current;
+
+	const output = rerender as IRefresher;
+	return output;
 };

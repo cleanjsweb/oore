@@ -1,5 +1,5 @@
 import { useMountState } from '@/helpers/mount-state';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 
 /**
@@ -9,22 +9,33 @@ import { useState } from 'react';
 export const useRerender = () => {
 	const isMounted = useMountState();
 
-	// Skip the value, we don't need it. Grab just the setter function.
-	const [, _forceRerender] = useState(Date.now());
+	const [key, forceRerender] = useState(Date.now());
 
-	const rerender = () => {
+	const rerender = useCallback(() => new Promise((resolve, reject) => {
+		const execute = () => {
+			const key = Date.now();
+			forceRerender(key);
+			resolve(key);
+		}
+
 		if (isMounted()) {
-			_forceRerender(Date.now());
+			execute();
 			return;
 		}
 
 		setTimeout(() => {
-			if (isMounted()) _forceRerender(Date.now());
+			if (isMounted()) {
+				execute();
+				return;
+			}
 			else {
 				console.log('Cannot rerender an unmounted component.');
 			}
 		}, 1000);
-	}
+	}), [forceRerender]);
+
+	// @ts-expect-error
+	rerender.key = key;
 
 	return rerender;
 };

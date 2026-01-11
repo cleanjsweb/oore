@@ -49,7 +49,7 @@ jobs:
           # -> Autotag will look for the appropriate file in in this location (relative to project root).
           root: "./" # optional, default is ./
           # -> Head branch to compare changes. It uses master by default
-          head_branch: main # optional, default is master
+          head_branch: stable # optional, default is master
           # -> Options include 'package' (for package.json), 'docker' (for Dockerfile), and 'regex' to extract from an arbitrary file. This does not need to be specified if the "regex_pattern" property is provided.
           strategy: package # optional, default is package
           # -> By default, package.json uses semantic versioning, such as "1.0.0". A prefix can be used to add text before the tag name. For example, if tag_prefx is set to "v", then the tag would be labeled as "v1.0.0".
@@ -70,15 +70,17 @@ jobs:
       - name: Check current branch
         run: git branch && git tag -l
 
-      # - name: Add "latest" Tag # git tag 'latest' --force
-      #   if: inputs.channel == 'stable'
-      #   uses: weareyipyip/walking-tag-action@v2.0.0
-      #   with:
-      #     # -> Name of the tag to update
-      #     tag-name: latest
-      #     # -> Message of the tag to update
-      #     tag-message: This tag marks the commit of the latest stable release.
-      - run: git tag 'latest' --force && git tag -l && git push origin latest -f
+      - name: Add "latest" Tag
+        if: inputs.channel == 'stable'
+        uses: weareyipyip/walking-tag-action@v2.0.0
+        with:
+          # -> Name of the tag to update
+          tag-name: latest
+          # -> Message of the tag to update
+          tag-message: This tag marks the commit of the latest stable release.
+      - name: Add "newest" Tag
+        if: inputs.channel == 'stable'
+        run: git tag 'newest' --force && git tag -l && git push origin newest -f
 
       - name: Check Outputs
         run: echo "${{ toJSON(steps.add_version_tag.outputs) }}" && git tag -l

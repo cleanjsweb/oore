@@ -1,0 +1,17 @@
+name: Prevent PRs from Specific Branches
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch name
+        run: |
+          echo "Pull Request Source Branch: ${{ github.head_ref }}"
+          if [[ "${{ github.head_ref }}" =~ branch_regex ]]; then
+            echo "::error::Pull requests from branches matching pattern are not allowed."
+            exit 1
+          fi

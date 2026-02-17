@@ -96,6 +96,8 @@ export const useSlots: IUseSlots = (children, self) => {
 				return;
 			};
 
+			// @todo Check for fragment
+
 			if (!isElementChild(child)) {
 				unmatchedChildren.push(child);
 				return;

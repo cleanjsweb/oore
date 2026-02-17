@@ -51,7 +51,7 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
  * 
  * @see {@link SlotComponent} for more on how to use the returned slot nodes.
  */
-export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliases) => {
+export const useSlots: IUseSlots = (children, self) => {
 	type TSlotsRecordArg = typeof slotComponents;
 
 	type TSlotAliasArg = keyof TSlotsRecordArg;
@@ -96,6 +96,8 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 				return;
 			};
 
+			// @todo Check for fragment
+
 			if (!isElementChild(child)) {
 				unmatchedChildren.push(child);
 				return;
@@ -137,6 +139,6 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 
 
 export type {
-	SlotNamedComponent,     SlottedComponent,   TSlotsRecord,
+	SlotNamedComponent,     SlottedReactComponent as SlottedComponent,   TSlotsRecord,
 	PotentialSlotComponent,
 } from './types';

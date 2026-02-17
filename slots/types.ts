@@ -1,3 +1,4 @@
+import { ClassComponent, ComponentLogic } from '@/classy';
 import type { ReactElement, ReactNode, JSXElementConstructor, FunctionComponent } from 'react';
 import type React from 'react';
 
@@ -91,11 +92,16 @@ export type SlotComponent<TComponentArg extends TComponent = TComponent> = (
  * directly from the parent component itself,
  * through an alias that is easy to remember.
  */
-export type SlottedComponent<
+export type SlottedReactComponent<
 	TComponentArg extends TComponent = TComponent,
 	TSlotAliasArg extends TSlotAlias = TSlotAlias, 
 	TSlotsRecordArg extends TSlotsRecord<TSlotAliasArg> = TSlotsRecord<TSlotAliasArg>
-> = TComponentArg & { [Key in 'Slots' | 'slots']: TSlotsRecordArg };
+> = TComponentArg & {
+	slots: TSlotsRecordArg;
+	// Slots: TSlotsRecordArg;
+	requiredSlotAliases?: TSlotAliasArg[];
+};
+
 
 /**
  * A record of slot aliases mapped to the corresponding `ReactNode`(s)
@@ -133,21 +139,7 @@ export interface IUseSlots {
 		 * grouped according to the predefined {@link slotComponents}.
 		 */
 		children: ReactNode,
-		/**
-		 * A map of slot aliases to their corresponding {@link SlotComponent}.
-		 * React nodes passed as children will be compared with the components
-		 * in this record to generate the categorized `slotNodes` object.
-		 */
-		slotComponents: TSlotsRecord<TSlotAliasArg>,
-		/**
-		 * An array of aliases to be treated as required. If a slot's
-		 * alias is in this array, the slot is treated as required.
-		 * 
-		 * If no ReactNode is found in {@link children | `children`}
-		 * for a required slot, an error will be thrown in development.
-		 * However in production this is softened to just a console warning.
-		 */
-		requiredSlotAliases?: TSlotAliasArg[],
+		self: SlottedReactComponent,
 	): TUseSlotsResult<TSlotAliasArg>;
 }
 

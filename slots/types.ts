@@ -1,9 +1,10 @@
+import { ComponentMethods } from '@/base';
 import { ClassComponent, ComponentLogic } from '@/classy';
-import type { ReactElement, ReactNode, JSXElementConstructor, FunctionComponent } from 'react';
-import type React from 'react';
+import type { ReactElement, ReactNode, JSXElementConstructor } from 'react';
 
 
-export type TComponent = JSXElementConstructor<any>;
+
+export type TComponent = JSXElementConstructor<any> | ComponentLogic | ComponentMethods;
 
 export type TSlotName = keyof any;
 export type TSlotAlias = keyof any;
@@ -92,8 +93,8 @@ export type SlotComponent<TComponentArg extends TComponent = TComponent> = (
  * directly from the parent component itself,
  * through an alias that is easy to remember.
  */
-export type SlottedReactComponent<
-	TComponentArg extends TComponent = TComponent,
+export type Slotted<
+	TComponentArg extends object = TComponent,
 	TSlotAliasArg extends TSlotAlias = TSlotAlias, 
 	TSlotsRecordArg extends TSlotsRecord<TSlotAliasArg> = TSlotsRecord<TSlotAliasArg>
 > = TComponentArg & {
@@ -139,7 +140,7 @@ export interface IUseSlots {
 		 * grouped according to the predefined {@link slotComponents}.
 		 */
 		children: ReactNode,
-		self: SlottedReactComponent,
+		Caller: Slotted,
 	): TUseSlotsResult<TSlotAliasArg>;
 }
 

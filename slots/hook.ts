@@ -140,6 +140,6 @@ export const useSlots: IUseSlots = (children, Caller) => {
 
 
 export type {
-	SlotNamedComponent,     SlottedReactComponent as SlottedComponent,   TSlotsRecord,
+	SlotNamedComponent,     Slotted as SlottedComponent,   TSlotsRecord,
 	PotentialSlotComponent,
 } from './types';

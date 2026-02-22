@@ -3,7 +3,7 @@ name: Validate PR Source Branches
 on:
   # pull_request:
   pull_request_target:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, reopened, ready_for_review, edited]
     branches: [stable, 'lts/**', 'v[0-9]+.[0-9]+.x', 'beta']
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
             exit 1
           fi
       - name: Check maintenance branch source
-        if: contains(fromJSON("['lts/**', 'v[0-9]+.[0-9]+.x']"), github.base_ref)
+        if: contains(fromJSON('["lts/**", "v[0-9]+.[0-9]+.x"]'), github.base_ref)
         run: |
           echo "Pull Request Source Branch: ${{ github.head_ref }}"
           echo "Pull Request Target Branch: ${{ github.base_ref }}"
@@ -28,7 +28,7 @@ jobs:
             echo "::error::Pull requests to maintenance branchec are only allowed from 'patch/*' or 'hotfix/*' branches."
             exit 1
           fi
-      - name: Check stable branch source
+      - name: Check beta branch source
         if: github.base_ref == 'beta'
         run: |
           echo "Pull Request Source Branch: ${{ github.head_ref }}"

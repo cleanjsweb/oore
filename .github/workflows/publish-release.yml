@@ -117,7 +117,7 @@ jobs:
       - run: npm version ${{ steps.add_version_tag.outputs.tagname }} --no-git-tag-version
         if: env.channel != 'stable'
 
-      - run: npm publish --tag ${{ env.channel }} ${{ env.channel == 'stable' && '--tag latest' }}
+      - run: npm publish --tag ${{ env.channel }} ${{ env.channel == 'stable' && '--tag latest' || ''}}
         # format('{0} {1}', '', env.channel)
         # env:
         #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

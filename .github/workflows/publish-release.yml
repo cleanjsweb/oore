@@ -44,13 +44,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-
-      # - uses: actions/setup-node@v4
-      #   with:
-      #   node-version: '24'
-      #   registry-url: 'https://registry.npmjs.org'
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
 
       # @todo Handle potential untrusted code from source branch.
       - name: Use Source Branch #  | xargs echo
@@ -112,6 +107,12 @@ jobs:
 
       - name: Check Outputs
         run: echo "${{ toJSON(steps.add_version_tag.outputs) }}" && git tag -l
+
+      - name: Use Source Branch #  | xargs echo
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Node:" && node -v
+          echo "npm:" && npm -v
 
       - run: npm ci
       - run: npm version ${{ steps.add_version_tag.outputs.tagname }} --no-git-tag-version

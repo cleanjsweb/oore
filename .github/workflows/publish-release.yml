@@ -120,7 +120,7 @@ jobs:
       - run: npm publish --tag ${{ env.channel }} ${{ env.channel == 'stable' && '--tag latest' || ''}}
         # format('{0} {1}', '', env.channel)
         # env:
-        #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        #  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Github Release
         id: github_release

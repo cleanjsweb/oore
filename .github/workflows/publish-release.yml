@@ -99,17 +99,20 @@ jobs:
       - name: Check current branch
         run: git branch && git tag -l
 
-      - name: Add "latest" Tag
+      - name: Add "sample-tag" Tag
         if: env.channel == 'stable'
         uses: weareyipyip/walking-tag-action@v2.0.0
         with:
           # -> Name of the tag to update
-          tag-name: latest
+          tag-name: sample-tag
           # -> Message of the tag to update
-          tag-message: This tag marks the commit of the latest stable release.
-      - name: Add "newest" Tag
-        if: env.channel == 'stable'
-        run: git tag 'newest' --force && git tag -l && git push origin newest -f
+          tag-message: 'Throwaway tag for testing workflow setup'
+      - name: Add "latest" Tag
+        if: github.ref_name == 'stable'
+        run: |
+          git tag 'latest' --force -m "This tag marks the commit of the latest stable release."
+          git tag -l
+          git push origin latest -f
 
       - name: Check Outputs
         run: echo "${{ toJSON(steps.add_version_tag.outputs) }}" && git tag -l

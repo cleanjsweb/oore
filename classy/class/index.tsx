@@ -8,6 +8,7 @@ import { useMemo } from 'react';
 import { ComponentInstance, useInstance } from '../instance';
 import { setFunctionName } from './utils/function-name';
 import { useRerender } from '@/helpers/rerender';
+import { Slotted, TSlotsRecord } from '@/slots/types';
 
 
 /**
@@ -108,7 +109,7 @@ export class ClassComponent<
 	 * // Render with `<Button.RC />`, or export RC to use the component in other files.
 	 * export default Button.RC;
 	 */
-	static readonly extract: Extractor = function FC (this, _Component) {
+	static readonly extract: Extractor = function FC (this, _Component, properties) {
 		const Component = _Component ?? this;
 		const isClassComponentType = Component.prototype instanceof ClassComponent;
 
@@ -117,14 +118,15 @@ export class ClassComponent<
 		);
 
 		type ComponentProps = InstanceType<typeof Component>['props'];
+		type TWrapper = VoidFunctionComponent<ComponentProps>;
 
 
 		/*************************************
 		 *    Begin Function Component       *
 		**************************************/
 
-		/** A class-based, React function component created with `@cleanweb/react`. {@link ClassComponent} */
-		const Wrapper: VoidFunctionComponent<ComponentProps> = (props) => {
+		/** A class-based, React function component created with `@cleanweb/oore`. {@link ClassComponent} */
+		const Wrapper: TWrapper = (props) => {
 			const instance = useInstance(Component, props);
 			const { template, templateContext } = instance;
 
@@ -141,14 +143,15 @@ export class ClassComponent<
 			}, [template]);
 
 			return template(templateContext);
-		}
+		};
+
 		/**************************************
-		*     End Function Component          *
+		*   👆🏼 End Function Component         *
 		**************************************/
 
 
 		setFunctionName(Wrapper, `$${Component.name}$`);
-		return Wrapper;
+		return Object.assign(Wrapper, properties);
 	};
 
 	/** @see {@link ClassComponent.extract} */

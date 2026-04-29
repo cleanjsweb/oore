@@ -6,19 +6,21 @@ import type { ICleanStateClass, ICleanStateConstructor, PutManyPayload, PutState
 
 import { useState } from 'react';
 
+
+
+type TReservedKey = keyof CleanStateBase<{}>;
+
 /** @internal */
 export class CleanStateBase<TState extends Record<string, any>> {
-	readonly reservedKeys: string[];
-	readonly valueKeys: string[];
+	readonly reservedKeys: TReservedKey[];
+	readonly valueKeys: Array<keyof TState>;
 
-	private _values_: Record<string, any> = {} as TState;
+	private _values_ = {} as TState;
 	private _initialValues_: TState;
-	private _setters_ = {} as {
-		[Key in keyof TState]: PutState<TState>[Key];
-	};
+	private _setters_ = {} as PutState<TState>;
 
 	constructor(initialState: TState) {
-		this.reservedKeys = Object.keys(this);
+		this.reservedKeys = Object.keys(this) as TReservedKey[];
 
 		/**
 		 * The keys from the initial state object.
@@ -33,7 +35,9 @@ export class CleanStateBase<TState extends Record<string, any>> {
 		this._initialValues_ = { ...initialState };
 
 		this.valueKeys.forEach((key) => {
-			if (this.reservedKeys.includes(key)) throw new Error(`The name "${key}" is reserved by CleanState and cannot be used to index state variables. Please use a different key.`);
+			if (this.reservedKeys.includes(key as TReservedKey)) {
+				throw new Error(`The name "${String(key)}" is reserved by CleanState and cannot be used to index state variables. Please use a different key.`);
+			}
 
 			const self = this;
 			Object.defineProperty(this, key, {
@@ -80,6 +84,9 @@ export class CleanStateBase<TState extends Record<string, any>> {
 	}
 	get initialState() {
 		return { ...this._initialValues_ };
+	}
+	get snapshot() {
+		return { ...this._values_ };
 	}
 
 	/**

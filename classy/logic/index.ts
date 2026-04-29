@@ -12,7 +12,7 @@ import { useCleanState } from '@/base/state';
  * It merely defines the type constraint for the type argument
  * passed when extending any of the logic classes.
  * 
- * It accepts null for components that don't take any props.
+ * It accepts null for components that do not take any props.
  */
 export type TPropsBase = NonPrimitive | null;
 
@@ -63,7 +63,12 @@ export class ComponentLogic<TProps extends TPropsBase = null> {
 	 * It receives the initial `props` object and should return
 	 * an object with the initial values for your component's state.
 	 */
-	getInitialState = (props: TProps extends null ? undefined : TProps): object => ({});
+	getInitialState = (props: TProps extends null ? undefined : TProps) => {
+		// @todo
+		// Should return type object. But `this.state.valueKeys` will be never[],
+		// yet tuple types need to be assignable to it when calling useLogic with a stateful logic class.
+		return {} as Record<keyof any, any>;
+	};
 
 	/**
 	 * Call React hooks from here. If your component needs
@@ -104,11 +109,12 @@ export class ComponentLogic<TProps extends TPropsBase = null> {
 export const useLogic: UseLogic = (...args: ULParams): ULReturn => {
 	const [Logic, props = {}] = args;
 
-	// In production, we only use the latestInstance the first time, and it's ignored every other time.
-	// This means changing the class at runtime will have no effect in production.
-	// latestInstance is only extracted into a separate variable for use in dev mode during HMR.
+	/**
+	 * In production, we only use the latestInstance the first time, and it's ignored every other time.
+	 * This means changing the class at runtime will have no effect in production.
+	 * latestInstance is only extracted into a separate variable for use in dev mode during HMR.
+	 */
 	const latestInstance = useMemo(() => new Logic(), [Logic]);
-	// const latestInstance = useMemo(() => new Logic(), []);
 	const instanceRef = useRef(latestInstance);
 
 	const refreshState = () => {

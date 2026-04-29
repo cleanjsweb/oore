@@ -20,8 +20,7 @@ type AsyncAllowedEffectCallback = () => Awaitable<IVoidFunction>;
  * 
  * @see https://github.com/cleanjsweb/neat-react#lifecycle-useinstance
  */
-export class ComponentInstance<TProps extends TPropsBase = null>
-		extends ComponentLogic<TProps> {
+export class ComponentInstance<TProps extends TPropsBase = null> extends ComponentLogic<TProps> {
 	/**
 	 * Runs only _before_ the first render,
 	 * i.e before the component instance is mounted.
@@ -89,6 +88,11 @@ export class ComponentInstance<TProps extends TPropsBase = null>
 		return this._templateContext;
 	}
 
+	/** @inheritdoc {@link templateContext} */
+	get ctx() {
+		return this._templateContext;
+	}
+
 	/**
 	 * Runs _before_ every render cycle, including the first.
 	 * Useful for logic that is involved in determining what to render.
@@ -139,10 +143,10 @@ export class ComponentInstance<TProps extends TPropsBase = null>
  * The provided class should be a subclass of {@link ComponentInstance}.
  */
 export const useInstance: UseInstance = (...args: UIParams): UIReturn => {
-	const [Component, props = {}] = args;
+	const [Class, props = {}] = args;
 
 	// useHooks.
-	const instance = useLogic(Component, props);
+	const instance = useLogic(Class, props);
 
 	// beforeMount, onMount, cleanUp.
 	useMountCallbacks(instance);

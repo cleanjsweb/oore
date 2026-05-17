@@ -139,7 +139,11 @@ export interface IUseSlots {
 		 * grouped according to the predefined {@link slotComponents}.
 		 */
 		children: ReactNode,
-		Caller: Slotted,
+		Caller: Slotted<
+			TComponent,
+			TSlotAliasArg, 
+			TSlotsRecord<TSlotAliasArg>
+		>,
 	): TUseSlotsResult<TSlotAliasArg>;
 }
 

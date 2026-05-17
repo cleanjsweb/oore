@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode, ComponentType, ReactPortal } from 'react';
+import type { ReactElement, ReactNode, ComponentType, ReactPortal, JSX } from 'react';
 
 
 type JSXTagLike = string | keyof JSX.IntrinsicElements | ComponentType<any>;

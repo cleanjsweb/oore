@@ -125,17 +125,21 @@ export type TypedNode<P, T extends JSXTagLike> = (
 	)
 );
 
-export type TSlotNode<TSlottted extends SlottedComponent> = TypedNode<
-	ComponentProps<valueof<TSlottted['Slots']>>,
-	valueof<TSlottted['Slots']>
->;
+export type TSlotNode<
+		TSlotted extends SlottedComponent,
+		Key extends keyof TSlotted['Slots'] = keyof TSlotted['Slots']> = (
+	TypedNode<
+		ComponentProps<TSlotted['Slots'][Key]>,
+		TSlotted['Slots'][Key]
+	>
+);
 
 /**
  * A record of slot aliases mapped to the corresponding `ReactNode`(s)
  * to be rendered for that slot.
  */
-export type TSlotNodes<TSlottted extends SlottedComponent> = {
-	[Key in keyof TSlottted['Slots']]?: Array<TSlotNode<TSlottted>>;
+export type TSlotNodes<TSlotted extends SlottedComponent> = {
+	[Key in keyof TSlotted['Slots']]?: Array<TSlotNode<TSlotted, Key>>;
 };
 
 export type TUseSlotsResult<TSlotted extends SlottedComponent> = Readonly<[

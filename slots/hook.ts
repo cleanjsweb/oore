@@ -1,5 +1,5 @@
-import type { ReactElement, ReactNode } from 'react';
-import type { IUseSlots, PotentialSlotComponent, SlotComponent, TSlotName, TSlotNodes, TUseSlotsResult } from './types';
+import type { ReactElement, ReactNode, ReactPortal } from 'react';
+import type { ComponentProps, IUseSlots, PotentialSlotComponent, SlotComponent, TSlotName, TSlotNode, TSlotNodes, TUseSlotsResult, TypedNode } from './types';
 
 import { throwDevError } from '@/helpers/errors';
 import React, { useMemo } from 'react';
@@ -41,6 +41,14 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 	return undefined;
 };
 
+export const isPortalChild = (child: ReactNode): child is ReactPortal => {
+	return (
+		!!child
+		&& typeof child === 'object'
+		&& 'children' in child
+	);
+};
+
 /**
  * Groups `children` prop into predefined slots.
  * 
@@ -56,7 +64,7 @@ export const useSlots: IUseSlots = (children, Caller) => {
 	type TSlotAliasArg = keyof TSlotsRecordArg;
 	type TSlotComponentArg = valueof<TSlotsRecordArg>;
 
-	type TSlotNodesArg = TSlotNodes<TSlotAliasArg>;
+	type TLocalSlotNodes = TSlotNodes<typeof Caller>;
 
 	const slotsAliasLookup = useMemo(() => {
 		type TEntries = Array<[TSlotAliasArg, TSlotComponentArg]>;
@@ -78,14 +86,16 @@ export const useSlots: IUseSlots = (children, Caller) => {
 	}, [Caller.Slots]);
 
 	const result = useMemo(() => {
-		const slotNodes: TSlotNodesArg = {};
+		const slotNodes: TLocalSlotNodes = {};
 		const unmatchedChildren: ReactNode[] = [];
 		const invalidChildren: any[] = [];
 		const requiredSlotAliases = [
 			...(Caller.requiredSlotAliases ?? [])
 		];
 
-		React.Children.forEach(children, (child) => {
+		React.Children.forEach(children, (_child) => {
+			const child = _child as TSlotNode<typeof Caller>;
+
 			if (!child) {
 				invalidChildren.push(child);
 				return;
@@ -104,19 +114,18 @@ export const useSlots: IUseSlots = (children, Caller) => {
 				return;
 			}
 
-			const slotAlias = (() => {
+			const slotAlias: keyof TLocalSlotNodes | null = (() => {
 				const slotName = getComponentSlotName(child.type, child);
 
-				return slotName ? slotsAliasLookup[slotName] : null;
+				return slotName ? slotsAliasLookup[slotName] ?? null : null;
 			})();
 
-			if (slotAlias && (typeof Caller.Slots[slotAlias] !== 'string')) {
-				if (Caller.Slots[slotAlias]?.isRequiredSlot) {
-					requiredSlotAliases.push(slotAlias);
-				}
-			}
-
 			if (slotAlias) {
+				if (typeof Caller.Slots[slotAlias] !== 'string') {
+					if (Caller.Slots[slotAlias]?.isRequiredSlot) {
+						requiredSlotAliases.push(slotAlias);
+					}
+				}
 				if (slotNodes[slotAlias]) {
 					slotNodes[slotAlias].push(child);
 				} else {
@@ -140,6 +149,6 @@ export const useSlots: IUseSlots = (children, Caller) => {
 
 
 export type {
-	SlotNamedComponent,     Slotted as SlottedComponent,   TSlotsRecord,
+	SlottedComponent,   TSlotsRecord,
 	PotentialSlotComponent,
 } from './types';

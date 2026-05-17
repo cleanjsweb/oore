@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { ComponentInstance, useInstance } from '../instance';
 import { setFunctionName } from './utils/function-name';
 import { useRerender } from '@/helpers/rerender';
-import { Slotted, TSlotsRecord } from '@/slots/types';
+import { SlottedComponent, TSlotsRecord } from '@/slots/types';
 
 
 /**

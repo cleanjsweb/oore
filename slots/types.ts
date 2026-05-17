@@ -1,10 +1,16 @@
-import { ComponentMethods } from '@/base';
-import { ClassComponent, ComponentLogic } from '@/classy';
-import type { ReactElement, ReactNode, JSXElementConstructor } from 'react';
+import type { ReactElement, ReactNode, ComponentType, ReactPortal } from 'react';
 
 
+type JSXTagLike = string | keyof JSX.IntrinsicElements | ComponentType<any>;
 
-export type TComponent = JSXElementConstructor<any> | ComponentLogic | ComponentMethods;
+/** This fixes overly narrow T type used by React's ComponentProps type. */
+export type ComponentProps<T extends JSXTagLike> = (
+	T extends ComponentType<infer P>
+		? P
+		: T extends keyof JSX.IntrinsicElements
+			? JSX.IntrinsicElements[T]
+			: {}
+);
 
 export type TSlotName = keyof any;
 export type TSlotAlias = keyof any;
@@ -16,23 +22,29 @@ export type TSlotAlias = keyof any;
  * each alias in this record to hold any `ReactNode`s rendered for that slot.
  */
 export type TSlotsRecord<TKey extends TSlotAlias = TSlotAlias> = {
-	[Key in TKey]: string | SlotComponent;
+	[Key in TKey]: SlotComponent<string | ComponentType<any>>;
 };
 
 export type DisplayNamedComponent<
-	TComponentArg extends TComponent = TComponent,
-	TDisplayNameArg extends string = string
-> = TComponentArg & { displayName: TDisplayNameArg };
+	TComponent extends ComponentType<any> = ComponentType<any>,
+	TName extends string = string
+> = TComponent & { displayName: TName };
 
-export type SlotNamedComponent<
-	TComponentArg extends TComponent = TComponent,
-	TSlotNameArg extends TSlotName = TSlotName
-> = TComponentArg & { slotName: TSlotNameArg };
+
+interface ISlotConfig<TName> {
+	slotName: TName,
+	/**
+	 * @deprecated The SlottedComponent should be responsible for indicating which slots it requires.
+	 * Individual slot components may be reused by multiple slotted components with varying requirements.
+	 */
+	isRequiredSlot?: boolean,
+}
 
 /**
  * A child component used to insert content into a specific slot in the parent component.
  * This can either be a string, or a React component with a `slotName` property.
- * If `slotName` is missing `displayName` will be used as a fallback.
+ * 
+ * > `displayName` is no longer supported as a fallback for `slotName`.
  * 
  * ### Strings
  * For strings, they are treated by React a native tags. This lets you use custom strings
@@ -48,7 +60,7 @@ export type SlotNamedComponent<
  * and you can map that to
  * ```jsx
  * <button
- *     {...slotNodes.Option.props}
+ *     {...slotNodes.Option[0].props}
  *     type="button"
  * />
  * ```
@@ -59,9 +71,9 @@ export type SlotNamedComponent<
  * 
  * So consumers may pass the following as `children`.
  * ```jsx
- * <Parent.slots.Content>
+ * <Parent.Slots.Content>
  *     Some awesome content.
- * </Parent.slots.Content>
+ * </Parent.Slots.Content>
  * ```
  * and you can map that to
  * ```jsx
@@ -72,7 +84,7 @@ export type SlotNamedComponent<
  * </>
  * ```
  * 
- * This means `Parent.slots.Content` must be defined as a proper React component
+ * This means `Parent.Slots.Content` must be defined as a proper React component
  * and is solely responsible for doing something with the `"Some awesome content."`
  * which was passed into it as children.
  * 
@@ -80,10 +92,15 @@ export type SlotNamedComponent<
  * extracts the props passed to the slot and handles
  * what the slot actually renders.
  */
-export type SlotComponent<TComponentArg extends TComponent = TComponent> = (
-	SlotNamedComponent<TComponentArg> 
-	| DisplayNamedComponent<TComponentArg>
-) & { isRequiredSlot?: boolean };
+export type SlotComponent<
+	TComponent extends JSXTagLike = ComponentType<any>,
+	TName extends TSlotName = TSlotName
+> = (
+	TComponent extends string
+		? TComponent
+		: TComponent & ISlotConfig<TName>
+);
+
 
 /**
  * A parent component which accepts content that can be grouped into predefined slots.
@@ -93,25 +110,35 @@ export type SlotComponent<TComponentArg extends TComponent = TComponent> = (
  * directly from the parent component itself,
  * through an alias that is easy to remember.
  */
-export type Slotted<
-	TComponentArg extends object = TComponent,
-	TSlotAliasArg extends TSlotAlias = TSlotAlias, 
-	TSlotsRecordArg extends TSlotsRecord<TSlotAliasArg> = TSlotsRecord<TSlotAliasArg>
-> = TComponentArg & {
-	Slots: TSlotsRecordArg;
-	requiredSlotAliases?: TSlotAliasArg[];
+export type SlottedComponent<
+	TOwner extends object = ComponentType<any>,
+	TSlots extends TSlotsRecord = TSlotsRecord
+> = TOwner & {
+	Slots: TSlots;
+	requiredSlotAliases?: Array<keyof TSlots>;
 };
 
+
+export type TypedNode<P, T extends JSXTagLike> = (
+	ReactElement<P, T> | (
+		ReactElement<P, T> & ReactPortal
+	)
+);
+
+export type TSlotNode<TSlottted extends SlottedComponent> = TypedNode<
+	ComponentProps<valueof<TSlottted['Slots']>>,
+	valueof<TSlottted['Slots']>
+>;
 
 /**
  * A record of slot aliases mapped to the corresponding `ReactNode`(s)
  * to be rendered for that slot.
  */
-export type TSlotNodes<TSlotAliasArg extends TSlotAlias> = {
-	[Key in TSlotAliasArg]?: Array<ReactElement<any>>;
+export type TSlotNodes<TSlottted extends SlottedComponent> = {
+	[Key in keyof TSlottted['Slots']]?: Array<TSlotNode<TSlottted>>;
 };
 
-export type TUseSlotsResult<TSlotAliasArg extends TSlotAlias = TSlotAlias> = Readonly<[
+export type TUseSlotsResult<TSlotted extends SlottedComponent> = Readonly<[
 	/**
 	 * A record of slot aliases to their corresponding React nodes.
 	 * Each alias maps to an array of one or more React nodes that were passed
@@ -119,7 +146,7 @@ export type TUseSlotsResult<TSlotAliasArg extends TSlotAlias = TSlotAlias> = Rea
 	 * 
 	 * If a slot was not rendered in `children`, it's alias will be `undefined` in this object.
 	 */
-	slotNodes: TSlotNodes<TSlotAliasArg>,
+	slotNodes: TSlotNodes<TSlotted>,
 	/**
 	 * Valid React nodes passed as children which did not match any of the
 	 * predefined slots.
@@ -132,19 +159,15 @@ export type TUseSlotsResult<TSlotAliasArg extends TSlotAlias = TSlotAlias> = Rea
 ]>;
 
 export interface IUseSlots {
-	<TSlotAliasArg extends TSlotAlias = TSlotAlias>(
+	<TSlotted extends SlottedComponent>(
 		/**
 		 * Your component's `children` prop.
 		 * The nodes it contains will be categorized and
 		 * grouped according to the predefined {@link slotComponents}.
 		 */
 		children: ReactNode,
-		Caller: Slotted<
-			TComponent,
-			TSlotAliasArg, 
-			TSlotsRecord<TSlotAliasArg>
-		>,
-	): TUseSlotsResult<TSlotAliasArg>;
+		Caller: TSlotted,
+	): TUseSlotsResult<TSlotted>;
 }
 
-export type PotentialSlotComponent = string | SlotComponent | TComponent;
+export type PotentialSlotComponent = string | SlotComponent | ComponentType<any>;

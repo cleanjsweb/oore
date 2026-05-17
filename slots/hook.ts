@@ -52,7 +52,7 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
  * @see {@link SlotComponent} for more on how to use the returned slot nodes.
  */
 export const useSlots: IUseSlots = (children, Caller) => {
-	type TSlotsRecordArg = typeof Caller.slots;
+	type TSlotsRecordArg = typeof Caller.Slots;
 	type TSlotAliasArg = keyof TSlotsRecordArg;
 	type TSlotComponentArg = valueof<TSlotsRecordArg>;
 
@@ -62,7 +62,7 @@ export const useSlots: IUseSlots = (children, Caller) => {
 		type TEntries = Array<[TSlotAliasArg, TSlotComponentArg]>;
 		type TLookup = Record<TSlotName, TSlotAliasArg>;
 
-		const entries = Object.entries(Caller.slots) as TEntries;
+		const entries = Object.entries(Caller.Slots) as TEntries;
 		const aliasLookup = {} as TLookup;
 
 		entries.forEach(([alias, RegisteredSlotComponent]) => {
@@ -75,7 +75,7 @@ export const useSlots: IUseSlots = (children, Caller) => {
 		});
 
 		return aliasLookup;
-	}, [Caller.slots]);
+	}, [Caller.Slots]);
 
 	const result = useMemo(() => {
 		const slotNodes: TSlotNodesArg = {};
@@ -110,8 +110,8 @@ export const useSlots: IUseSlots = (children, Caller) => {
 				return slotName ? slotsAliasLookup[slotName] : null;
 			})();
 
-			if (slotAlias && (typeof Caller.slots[slotAlias] !== 'string')) {
-				if (Caller.slots[slotAlias]?.isRequiredSlot) {
+			if (slotAlias && (typeof Caller.Slots[slotAlias] !== 'string')) {
+				if (Caller.Slots[slotAlias]?.isRequiredSlot) {
 					requiredSlotAliases.push(slotAlias);
 				}
 			}

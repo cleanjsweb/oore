@@ -98,8 +98,7 @@ export type Slotted<
 	TSlotAliasArg extends TSlotAlias = TSlotAlias, 
 	TSlotsRecordArg extends TSlotsRecord<TSlotAliasArg> = TSlotsRecord<TSlotAliasArg>
 > = TComponentArg & {
-	slots: TSlotsRecordArg;
-	// Slots: TSlotsRecordArg;
+	Slots: TSlotsRecordArg;
 	requiredSlotAliases?: TSlotAliasArg[];
 };
 

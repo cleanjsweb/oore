@@ -85,6 +85,7 @@ export const useSlots: IUseSlots = (children, Caller) => {
 		return aliasLookup;
 	}, [Caller.Slots]);
 
+	// @todo Expose original source order of `children` with respect to slot aliases.
 	const result = useMemo(() => {
 		const slotNodes: TLocalSlotNodes = {};
 		const unmatchedChildren: ReactNode[] = [];
@@ -150,5 +151,5 @@ export const useSlots: IUseSlots = (children, Caller) => {
 
 export type {
 	SlottedComponent,   TSlotsRecord,
-	PotentialSlotComponent,
+	SlotComponent,      PotentialSlotComponent,
 } from './types';

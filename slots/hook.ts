@@ -3,6 +3,7 @@ import type { ComponentProps, IUseSlots, PotentialSlotComponent, SlotComponent, 
 
 import { throwDevError } from '@/helpers/errors';
 import React, { useMemo } from 'react';
+import { canIndex } from '@/helpers';
 
 
 export const isElementChild = (child: ReactNode): child is ReactElement<any, any> => {
@@ -23,9 +24,6 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 		const slotName = child.props['data-slot-name'];
 
 		if (keyTypes.includes(typeof slotName)) {
-			if (typeof child.type === 'string') {
-				child.props.tagName = child.type;
-			}
 			return slotName;
 		}
 	}

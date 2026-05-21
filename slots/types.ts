@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode, ComponentType, ReactPortal, JSX } from 'react';
 
 
+/** @todo ComponentType force children to be ReactNode, but custom components can have any children type. */
 type JSXTagLike = string | keyof JSX.IntrinsicElements | ComponentType<any>;
 
 /** This fixes overly narrow T type used by React's ComponentProps type. */

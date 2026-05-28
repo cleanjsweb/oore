@@ -104,7 +104,7 @@ export class ComponentInstance<TProps extends TPropsBase = null>
 	 * PS: You can conditionally update state from here, but with certain caveats.
 	 * {@link https://react.dev/reference/react/useState#storing-information-from-previous-renders | See the React docs for details}.
 	 */
-	beforeRender: () => object | void = () => {};
+	beforeRender: () => any = () => ({});
 
 	/**
 	 * Runs **_after_** every render cycle, including the first.

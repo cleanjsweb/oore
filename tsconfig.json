@@ -2,13 +2,13 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"rootDir": ".",
-		"outDir": "build",
+		"outDir": "./build",
 		"paths": {
 			"@/*": [
 				"./*"
 			]
 		},
-		"target": "es5",
+		"target": "es6",
 		"lib": [
 			"dom",
 			"dom.iterable",
@@ -23,8 +23,8 @@
 		"forceConsistentCasingInFileNames": true,
 		"incremental": false,
 		"esModuleInterop": true,
-		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
+		"module": "esnext",
+		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"jsx": "react-jsx",
@@ -36,12 +36,11 @@
 		"exactOptionalPropertyTypes": true,
 	},
 	"include": [
-		// "**/[!globals].ts",
+		"./globals.d.ts",
 		"**/*.ts",
 		"**/*.tsx"
 	],
 	"exclude": [
-		"**/globals.ts",
 		"node_modules/**/**.*",
 		"build/**/**.*",
 		"mirror-pkg/**/**.*"

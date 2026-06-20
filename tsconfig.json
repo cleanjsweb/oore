@@ -36,12 +36,11 @@
 		"exactOptionalPropertyTypes": true,
 	},
 	"include": [
-		// "**/[!globals].ts",
+		"./globals.d.ts",
 		"**/*.ts",
 		"**/*.tsx"
 	],
 	"exclude": [
-		"**/globals.ts",
 		"node_modules/**/**.*",
 		"build/**/**.*",
 		"mirror-pkg/**/**.*"

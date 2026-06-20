@@ -14,29 +14,24 @@
 	"types": "./build/index.d.ts",
 	"exports": {
 		".": {
-			"types": "./build/classy/index.d.ts",
 			"import": "./build/classy/index.js",
-			"require": "./build/classy/index.cjs"
+			"require": "./build/_cjs/classy/index.js"
 		},
 		"./base": {
-			"types": "./build/base/index.d.ts",
 			"import": "./build/base/index.js",
-			"require": "./build/base/index.cjs"
+			"require": "./build/_cjs/base/index.js"
 		},
 		"./helpers": {
-			"types": "./build/helpers/index.d.ts",
 			"import": "./build/helpers/index.js",
-			"require": "./build/helpers/index.cjs"
+			"require": "./build/_cjs/helpers/index.js"
 		},
 		"./slots": {
-			"types": "./build/slots/index.d.ts",
 			"import": "./build/slots/index.js",
-			"require": "./build/slots/index.cjs"
+			"require": "./build/_cjs/slots/index.js"
 		},
 		"./all": {
-			"types": "./build/index.d.ts",
 			"import": "./build/index.js",
-			"require": "./build/index.cjs"
+			"require": "./build/_cjs/index.js"
 		}
 	},
 	"scripts": {

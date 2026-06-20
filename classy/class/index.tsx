@@ -145,10 +145,14 @@ export class ClassComponent<
 	 */
 	static readonly extract: Extractor = function FC (this, _Component, properties) {
 		const Component = _Component ?? this;
-		const isClassComponentType = Component.prototype instanceof ClassComponent;
+		const isClassComponentType = (
+			Component === ClassComponent
+			|| Component.prototype instanceof ClassComponent
+			|| ClassComponent.isPrototypeOf(Component)
+		);
 
 		if (!isClassComponentType) throw new Error(
-			'Attempted to initialize ClassComponent with invalid Class type. Either pass, as an argument to FC(), a class that extends ClassComponent (e.g `export FC(MyComponent);`), or ensure FC() is called as a method on a ClassComponent constructor type (e.g `export MyComponent.FC()`).'
+			'Attempted to initialize `ClassComponent` with an invalid Class type. Either call `extract()` with a class argument that extends ClassComponent (e.g `export default extract(MyComponent);`), or ensure `extract()` is called as a method on a ClassComponent constructor type (e.g `export default MyComponent.extract();`).'
 		);
 
 		type ComponentProps = InstanceType<typeof Component>['props'];

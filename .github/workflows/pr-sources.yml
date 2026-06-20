@@ -15,7 +15,7 @@ jobs:
         run: |
           echo "Pull Request Source Branch: ${{ github.head_ref }}"
           echo "Pull Request Target Branch: ${{ github.base_ref }}"
-          if [[ -z "${{ github.head_ref }}" =~ ^(beta|hotfix\/*)$ ]]; then
+          if [[ -z "${{ github.head_ref }}" ]] || [[ ! "${{ github.head_ref }}" =~ ^(beta|hotfix\/.*)$ ]]; then
             echo "::error::Pull requests to the 'stable' branch are only allowed from the 'beta' or 'hotfix/*' branches."
             exit 1
           fi
@@ -24,7 +24,7 @@ jobs:
         run: |
           echo "Pull Request Source Branch: ${{ github.head_ref }}"
           echo "Pull Request Target Branch: ${{ github.base_ref }}"
-          if [[ -z "${{ github.head_ref }}" =~ ^(fix|patch|hotfix)\/*$ ]]; then
+          if [[ -z "${{ github.head_ref }}" ]] || [[ ! "${{ github.head_ref }}" =~ ^(fix|patch|hotfix)\/.*$ ]]; then
             echo "::error::Pull requests to maintenance branchec are only allowed from 'patch/*' or 'hotfix/*' branches."
             exit 1
           fi
@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "Pull Request Source Branch: ${{ github.head_ref }}"
           echo "Pull Request Target Branch: ${{ github.base_ref }}"
-          if [[ -z "${{ github.head_ref }}" =~ ^(feature|feat|fix|patch|chore)\/*$ ]]; then
+          if [[ -z "${{ github.head_ref }}" ]] || [[ ! "${{ github.head_ref }}" =~ ^(feature|feat|fix|patch|chore)\/.*$ ]]; then
             echo "::error::Pull requests to the 'beta' branch are only allowed from 'feature/*', 'patch/*', or 'hotfix/*' branches."
             exit 1
           fi

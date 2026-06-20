@@ -35,6 +35,10 @@
 		"strictBindCallApply": true,
 		"exactOptionalPropertyTypes": true,
 	},
+	"tsc-alias": {
+		"resolveFullPaths": true,
+		"resolveFullExtension": ".js" 
+	},
 	"include": [
 		"./globals.d.ts",
 		"**/*.ts",

@@ -9,18 +9,42 @@
 		"build",
 		".npmrc"
 	],
-	"main": "build/index.js",
+	"main": "./build/index.cjs",
+	"module": "./build/index.js",
+	"types": "./build/index.d.ts",
 	"exports": {
-		".": "./build/classy/index.js",
-		"./base": "./build/base/index.js",
-		"./helpers": "./build/helpers/index.js",
-		"./slots": "./build/slots/index.js",
-		"./all": "./build/index.js"
+		".": {
+			"types": "./build/classy/index.d.ts",
+			"import": "./build/classy/index.js",
+			"require": "./build/classy/index.cjs"
+		},
+		"./base": {
+			"types": "./build/base/index.d.ts",
+			"import": "./build/base/index.js",
+			"require": "./build/base/index.cjs"
+		},
+		"./helpers": {
+			"types": "./build/helpers/index.d.ts",
+			"import": "./build/helpers/index.js",
+			"require": "./build/helpers/index.cjs"
+		},
+		"./slots": {
+			"types": "./build/slots/index.d.ts",
+			"import": "./build/slots/index.js",
+			"require": "./build/slots/index.cjs"
+		},
+		"./all": {
+			"types": "./build/index.d.ts",
+			"import": "./build/index.js",
+			"require": "./build/index.cjs"
+		}
 	},
 	"scripts": {
 		"prebuild": "rimraf ./build",
-		"build": "tsc && tsc-alias",
-		"postbuild": "copyfiles tsconfig.json build",
+		"build": "npm run build:esm && npm run build:cjs",
+		"build:esm": "tsc && tsc-alias",
+		"build:cjs": "tsc -p tsconfig.cjs.json && tsc-alias -p tsconfig.cjs.json",
+		"postbuild": "copyfiles tsconfig.json globals.d.ts build",
 		"build:docs": "typedoc",
 		"_": "",
 		"serve-docs": "serve docs",
@@ -62,7 +86,7 @@
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.25.9",
 		"@babel/preset-typescript": "^7.26.0",
-		"@types/node": "20.14.10",
+		"@types/node": "^22.20.0",
 		"@types/react": "^16",
 		"@types/webpack-env": "^1.18.8",
 		"babel-preset-react-app": "^10.0.1",
@@ -71,9 +95,10 @@
 		"eslint-plugin-jsdoc": "^50.5.0",
 		"eslint-plugin-react": "^7.37.2",
 		"globals": "^15.12.0",
+		"jsonc-parser": "~3.3.1",
 		"rimraf": "^6.0.1",
 		"serve": "^14.2.4",
-		"tsc-alias": "1.8.10",
+		"tsc-alias": "1.8.0",
 		"typedoc": "latest",
 		"typedoc-plugin-coverage": "^3.4.1",
 		"typedoc-plugin-markdown": "^4.4.1",

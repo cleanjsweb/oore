@@ -3,9 +3,6 @@
  * @module CleanState
  */
 
-import '../../globals';
-
-
 export { CleanState } from './class';
 
 export { useCleanState } from './hooks';

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { debounce } from '.';
 
 
@@ -17,11 +17,17 @@ export function useDebouncedState<T extends any>(init: T, config: TDelayConfig) 
 
 	const debouncedSetter = useCallback(debounce(...debounceArgs), debounceArgs);
 
-	const setter = useCallback((value: T) => {
-		if (enableStaging) {
-			setStagedValue(value);
-		}
-		debouncedSetter(value);
+	const setter = useMemo(() => {
+		const output = (value: T) => {
+			if (enableStaging) {
+				setStagedValue(value);
+			}
+			debouncedSetter(value);
+		};
+
+		output.flush = debouncedSetter.flush;
+
+		return output;
 	}, [enableStaging, debouncedSetter]);
 
 	return [debouncedValue, setter, stagedValue] as const;

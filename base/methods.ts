@@ -26,9 +26,9 @@ import { useEffect, useMemo, useRef } from 'react';
  */
 export class ComponentMethods<
 		TProps extends object = {},
-		TState extends TStateData | null = null> {
+		TState extends object | null = null> {
 	declare readonly props: TProps;
-	declare readonly state: TState extends TStateData ? TCleanState<TState> : null;
+	declare readonly state: TState;
 
 	/**
 	 * Persist class members during HMR. {@include ../classy/logic/hrm-preserve-keys.md}
@@ -48,22 +48,22 @@ export class ComponentMethods<
 };
 
 type UseMethods = {
-	<Class extends typeof ComponentMethods<object, object>>(
-		Methods: Class & Constructor<InstanceType<Class>>,
+    <Class extends typeof ComponentMethods<object, object>>(
+		Methods: Class,
 		props: InstanceType<Class>['props'],
-		state: InstanceType<Class>['state'],
+		state: InstanceType<Class>['state']
 	): InstanceType<Class>;
 
 	<Class extends typeof ComponentMethods<object, null>>(
-		Methods: Class & Constructor<InstanceType<Class>>,
+		Methods: Class,
 		props: InstanceType<Class>['props'],
-		state?: null // null should be equal to InstanceType<Class>['state'] in this case.
+		state?: null // `null` should be equal to InstanceType<Class>['state'] in this case.
 	): InstanceType<Class>;
 
 	<Class extends typeof ComponentMethods<NeverObject, null>>(
-		Methods: Class & Constructor<InstanceType<Class>>,
+		Methods: Class
 	): InstanceType<Class>;
-}
+};
 
 type UMParams = [
 	Methods: (
@@ -71,7 +71,7 @@ type UMParams = [
 		& Constructor<ComponentMethods<object, object>>
 	),
 	props?: object,
-	state?: TCleanState<object> | null
+	state?: object | null
 ]
 
 type UMReturn = ComponentMethods<object, object>;

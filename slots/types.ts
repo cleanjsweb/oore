@@ -33,12 +33,7 @@ export type DisplayNamedComponent<
 
 
 interface ISlotConfig<TName> {
-	slotName: TName,
-	/**
-	 * @deprecated The SlottedComponent should be responsible for indicating which slots it requires.
-	 * Individual slot components may be reused by multiple slotted components with varying requirements.
-	 */
-	isRequiredSlot?: boolean,
+	slotName?: TName,
 }
 
 /**

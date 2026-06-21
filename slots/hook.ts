@@ -136,6 +136,7 @@ export const useSlots: IUseSlots = (children, Caller) => {
 			else unmatchedChildren.push(child);
 		});
 
+		/** @todo Type keys as NonNullable if included in this array. */
 		requiredSlotAliases.forEach((slotAlias) => {
 			if (!slotNodes[slotAlias]) {
 				throwDevError(`Missing required slot "${String(slotAlias)}".`);

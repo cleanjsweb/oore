@@ -33,12 +33,7 @@ export type DisplayNamedComponent<
 
 
 interface ISlotConfig<TName> {
-	slotName: TName,
-	/**
-	 * @deprecated The SlottedComponent should be responsible for indicating which slots it requires.
-	 * Individual slot components may be reused by multiple slotted components with varying requirements.
-	 */
-	isRequiredSlot?: boolean,
+	slotName?: TName,
 }
 
 /**
@@ -120,11 +115,11 @@ export type SlottedComponent<
 };
 
 
-export type TypedNode<P, T extends JSXTagLike> = (
+export type TypedNode<P, T extends JSXTagLike> = Omit<ReactElement<P>, 'type'> & { type: T }; /* (
 	ReactElement<P, T> | (
 		ReactElement<P, T> & ReactPortal
 	)
-);
+); */
 
 export type TSlotNode<
 		TSlotted extends SlottedComponent,

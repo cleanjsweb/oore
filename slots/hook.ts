@@ -34,6 +34,8 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 		return TargetComponent.slotName;
 	} else if ('displayName' in TargetComponent) {
 		return TargetComponent.displayName;
+	} else if ('name' in TargetComponent) {
+		return TargetComponent.name;
 	}
 
 	return undefined;
@@ -65,19 +67,19 @@ export const useSlots: IUseSlots = (children, Caller) => {
 	type TLocalSlotNodes = TSlotNodes<typeof Caller>;
 
 	const slotsAliasLookup = useMemo(() => {
-		type TEntries = Array<[TSlotAliasArg, TSlotComponentArg]>;
-		type TLookup = Record<TSlotName, TSlotAliasArg>;
-
-		const entries = Object.entries(Caller.Slots) as TEntries;
-		const aliasLookup = {} as TLookup;
+		const entries = Object.entries(Caller.Slots) as Array<[TSlotAliasArg, TSlotComponentArg]>;
+		const aliasLookup = {
+			byName: {} as Record<TSlotName, TSlotAliasArg>,
+			byIdentity: new Map<TSlotComponentArg, TSlotAliasArg>(),
+		};
 
 		entries.forEach(([alias, RegisteredSlotComponent]) => {
 			const slotName = getComponentSlotName(RegisteredSlotComponent);
 			if (!slotName) {
-				throwDevError(`A registered slot component did not have a slot name. All components registered as slots must either be a string tag-name or a React component with either "slotName" or "displayName". The affected component was: ${RegisteredSlotComponent}`);
-				return;
+				aliasLookup.byIdentity.set(RegisteredSlotComponent, alias);
+				aliasLookup.byName[alias] = alias;
 			}
-			aliasLookup[slotName] = alias;
+			else aliasLookup.byName[slotName] = alias;
 		});
 
 		return aliasLookup;
@@ -116,15 +118,15 @@ export const useSlots: IUseSlots = (children, Caller) => {
 			const slotAlias: keyof TLocalSlotNodes | null = (() => {
 				const slotName = getComponentSlotName(child.type, child);
 
-				return slotName ? slotsAliasLookup[slotName] ?? null : null;
+				const alias = slotName
+					? slotsAliasLookup.byName[slotName]
+					: slotsAliasLookup.byIdentity.get(child.type)
+				;
+
+				return alias ?? null;
 			})();
 
 			if (slotAlias) {
-				if (typeof Caller.Slots[slotAlias] !== 'string') {
-					if (Caller.Slots[slotAlias]?.isRequiredSlot) {
-						requiredSlotAliases.push(slotAlias);
-					}
-				}
 				if (slotNodes[slotAlias]) {
 					slotNodes[slotAlias].push(child);
 				} else {
@@ -134,6 +136,7 @@ export const useSlots: IUseSlots = (children, Caller) => {
 			else unmatchedChildren.push(child);
 		});
 
+		/** @todo Type keys as NonNullable if included in this array. */
 		requiredSlotAliases.forEach((slotAlias) => {
 			if (!slotNodes[slotAlias]) {
 				throwDevError(`Missing required slot "${String(slotAlias)}".`);

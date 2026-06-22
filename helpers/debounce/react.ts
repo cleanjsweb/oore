@@ -1,3 +1,4 @@
+import type { SetStateAction } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { debounce } from '.';
 
@@ -19,7 +20,7 @@ export function useDebouncedState<T extends any>(init: T, config: TDelayConfig) 
 	const debouncedSetter = useCallback(debounce(...debounceArgs), debounceArgs);
 
 	const setter = useMemo(() => {
-		const _setter = (value: T) => {
+		const _setter = (value: SetStateAction<T>) => {
 			if (enableStaging) {
 				setStagedValue(value);
 			}

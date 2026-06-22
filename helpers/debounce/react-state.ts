@@ -33,9 +33,11 @@ export function useDebouncedState<T extends any>(init: T, config: TDelayConfig) 
 		_setter.flush = debouncedSetter.flush;
 		_setter.pause = () => setPaused(true);
 		_setter.resume = () => setPaused(false);
+		_setter.paused = paused;
 
 		return _setter;
 	}, [enableStaging, debouncedSetter]);
 
+	setter.paused = paused;
 	return [debouncedValue, setter, stagedValue] as const;
 }

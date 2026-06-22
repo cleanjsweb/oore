@@ -10,7 +10,7 @@ export * from './use-component';
 
 export * from './object-gate';
 export * from './debounce';
-export * from './debounce/react';
+export * from './debounce/react-state';
 
 export * from './type-guards';
 

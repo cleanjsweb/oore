@@ -115,7 +115,7 @@ export type SlottedComponent<
 };
 
 
-export type TypedNode<P, T extends JSXTagLike = any> = ReactElement<P>; /* (
+export type TypedNode<P, T extends JSXTagLike> = Omit<ReactElement<P>, 'type'> & { type: T }; /* (
 	ReactElement<P, T> | (
 		ReactElement<P, T> & ReactPortal
 	)

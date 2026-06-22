@@ -8,7 +8,6 @@ import { useMemo } from 'react';
 import { ComponentInstance, useInstance } from '../instance';
 import { setFunctionName } from './utils/function-name';
 import { useRerender } from '@/helpers/rerender';
-import { SlottedComponent, TSlotsRecord } from '@/slots/types';
 
 
 /**
@@ -81,6 +80,40 @@ export class ClassComponent<
 	 */
 	declare readonly forceUpdate: VoidFunction;
 
+	/**
+	 * A standard React function component that works like any
+	 * other function component and can be rendered as JSX.
+	 * \`<MyComponent.FC />\`
+	 */
+	static _FC<T extends typeof ClassComponent>(this: T, props: InstanceType<T>['props']) {
+		const instance = useInstance(this, props);
+		const { template, templateContext } = instance;
+
+		let _forceUpdate: typeof instance.forceUpdate;
+
+		// @ts-expect-error (Cannot assign to 'forceUpdate' because it is a read-only property.ts(2540))
+		instance.forceUpdate = (
+			_forceUpdate = useRerender() // Moved this to separate line to allow TS errors. Use proxy local variable to regain some type checking for the assignment to `instance.forceUpdate`.
+		);
+
+		// Add calling component name to template function name in stack traces.
+		useMemo(() => {
+			setFunctionName(template, `${this.name}.template`);
+		}, [template]);
+
+		return template(templateContext);
+	};
+
+	static {
+		setFunctionName(this._FC, `$${this.name}$`);
+	}
+
+	static _BoundFC: typeof this._FC | undefined;
+
+	static get FC() {
+		if (this._BoundFC) return this._BoundFC;
+		return this._BoundFC = this._FC.bind(this);
+	}
 
 	/*************************************
 	 *   Function Component Extractor    *
@@ -111,10 +144,14 @@ export class ClassComponent<
 	 */
 	static readonly extract: Extractor = function FC (this, _Component, properties) {
 		const Component = _Component ?? this;
-		const isClassComponentType = Component.prototype instanceof ClassComponent;
+		const isClassComponentType = (
+			Component === ClassComponent
+			|| Component.prototype instanceof ClassComponent
+			|| ClassComponent.isPrototypeOf(Component)
+		);
 
 		if (!isClassComponentType) throw new Error(
-			'Attempted to initialize ClassComponent with invalid Class type. Either pass, as an argument to FC(), a class that extends ClassComponent (e.g `export FC(MyComponent);`), or ensure FC() is called as a method on a ClassComponent constructor type (e.g `export MyComponent.FC()`).'
+			'Attempted to initialize `ClassComponent` with an invalid Class type. Either call `extract()` with a class argument that extends ClassComponent (e.g `export default extract(MyComponent);`), or ensure `extract()` is called as a method on a ClassComponent constructor type (e.g `export default MyComponent.extract();`).'
 		);
 
 		type ComponentProps = InstanceType<typeof Component>['props'];
@@ -154,10 +191,13 @@ export class ClassComponent<
 		return Object.assign(Wrapper, properties);
 	};
 
-	/** @see {@link ClassComponent.extract} */
-	static readonly FC = this.extract;
+	/**
+	 * A standard React function component that works like any
+	 * other function component and can be rendered as JSX.
+	 * \`<MyComponent.RC />\`
+	 */
+	static readonly RC = this.extract();
 }
-
 
 export { ClassComponent as Component };
 

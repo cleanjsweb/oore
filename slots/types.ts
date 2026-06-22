@@ -115,11 +115,11 @@ export type SlottedComponent<
 };
 
 
-export type TypedNode<P, T extends JSXTagLike> = (
+export type TypedNode<P, T extends JSXTagLike = any> = ReactElement<P>; /* (
 	ReactElement<P, T> | (
 		ReactElement<P, T> & ReactPortal
 	)
-);
+); */
 
 export type TSlotNode<
 		TSlotted extends SlottedComponent,

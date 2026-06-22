@@ -154,12 +154,10 @@ export const debounce: IDebounce = (...init) => {
 		// Execute the pending call.
 		(async () => {
 			try {
-				const result = (await callback(...args)) ?? {};
-				result.__debounceFlushedWithArgs = args;
-				resolve?.(result);
-			} catch (_reason: any) {
-				const reason = _reason ?? {};
-				reason.__debounceFlushedWithArgs = args;
+				// const result = (await callback(...args)) ?? {};
+				// result.__debounceFlushedWithArgs = args;
+				resolve?.(await callback(...args));
+			} catch (reason: any) {
 				reject?.(reason);
 			}
 		})();

@@ -146,7 +146,6 @@ export const useSlots: IUseSlots = (children, Caller) => {
 	return result;
 };
 
-
 export type {
 	WithSlotsConfig, WithSlotsConfig as SlottedComponent,
 	TSlotsRecord, SlotComponent, PotentialSlotComponent,

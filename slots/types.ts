@@ -111,13 +111,15 @@ export type SlotComponent<
  * directly from the parent component itself,
  * through an alias that is easy to remember.
  */
-export type SlottedComponent<
+export type WithSlotsConfig<
 	TOwner extends object = ComponentType<any>,
 	TSlots extends TSlotsRecord = TSlotsRecord
 > = TOwner & {
 	Slots: TSlots;
 	requiredSlotAliases?: Array<keyof TSlots>;
 };
+
+export type { WithSlotsConfig as SlottedComponent };
 
 
 export type TypedNode<P, T extends JSXTagLike> = (
@@ -127,11 +129,11 @@ export type TypedNode<P, T extends JSXTagLike> = (
 );
 
 export type TSlotNode<
-		TSlotted extends SlottedComponent,
-		Key extends keyof TSlotted['Slots'] = keyof TSlotted['Slots']> = (
+		TConfig extends WithSlotsConfig<object>,
+		Key extends keyof TConfig['Slots'] = keyof TConfig['Slots']> = (
 	TypedNode<
-		ComponentProps<TSlotted['Slots'][Key]>,
-		TSlotted['Slots'][Key]
+		ComponentProps<TConfig['Slots'][Key]>,
+		TConfig['Slots'][Key]
 	>
 );
 
@@ -139,11 +141,11 @@ export type TSlotNode<
  * A record of slot aliases mapped to the corresponding `ReactNode`(s)
  * to be rendered for that slot.
  */
-export type TSlotNodes<TSlotted extends SlottedComponent> = {
+export type TSlotNodes<TSlotted extends WithSlotsConfig> = {
 	[Key in keyof TSlotted['Slots']]?: Array<TSlotNode<TSlotted, Key>>;
 };
 
-export type TUseSlotsResult<TSlotted extends SlottedComponent> = Readonly<[
+export type TUseSlotsResult<TSlotted extends WithSlotsConfig> = Readonly<[
 	/**
 	 * A record of slot aliases to their corresponding React nodes.
 	 * Each alias maps to an array of one or more React nodes that were passed
@@ -164,7 +166,7 @@ export type TUseSlotsResult<TSlotted extends SlottedComponent> = Readonly<[
 ]>;
 
 export interface IUseSlots {
-	<TSlotted extends SlottedComponent>(
+	<TSlotted extends WithSlotsConfig>(
 		/**
 		 * Your component's `children` prop.
 		 * The nodes it contains will be categorized and

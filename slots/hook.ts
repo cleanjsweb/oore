@@ -1,8 +1,9 @@
-import type { ReactElement, ReactNode } from 'react';
-import type { IUseSlots, PotentialSlotComponent, TSlotName, TSlotNodes } from './types';
+import type { ReactElement, ReactNode, ReactPortal } from 'react';
+import type { ComponentProps, IUseSlots, PotentialSlotComponent, SlotComponent, TSlotName, TSlotNode, TSlotNodes, TUseSlotsResult, TypedNode } from './types';
 
 import { throwDevError } from '@/helpers/errors';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { canIndex } from '@/helpers';
 
 
 export const isElementChild = (child: ReactNode): child is ReactElement<any, any> => {
@@ -23,9 +24,6 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 		const slotName = child.props['data-slot-name'];
 
 		if (keyTypes.includes(typeof slotName)) {
-			if (typeof child.type === 'string') {
-				child.props.tagName = child.type;
-			}
 			return slotName;
 		}
 	}
@@ -41,21 +39,36 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 	return undefined;
 };
 
-export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliases) => {
-	type TSlotsRecordArg = typeof slotComponents;
+export const isPortalChild = (child: ReactNode): child is ReactPortal => {
+	return (
+		!!child
+		&& typeof child === 'object'
+		&& 'children' in child
+	);
+};
 
+/**
+ * Groups `children` prop into predefined slots.
+ * 
+ * @returns A {@link TUseSlotsResult} array,
+ * which includes a `slotNodes` object that maps the keys from
+ * the predefined {@link Caller.slots} object to the corresponding
+ * React node(s) that were rendered for that slot.
+ * 
+ * @see {@link SlotComponent} for more on how to use the returned slot nodes.
+ */
+export const useSlots: IUseSlots = (children, Caller) => {
+	type TSlotsRecordArg = typeof Caller.Slots;
 	type TSlotAliasArg = keyof TSlotsRecordArg;
 	type TSlotComponentArg = valueof<TSlotsRecordArg>;
 
-	type TSlotNodesArg = TSlotNodes<TSlotAliasArg>;
-
-	const { useMemo } = React;
+	type TLocalSlotNodes = TSlotNodes<typeof Caller>;
 
 	const slotsAliasLookup = useMemo(() => {
 		type TEntries = Array<[TSlotAliasArg, TSlotComponentArg]>;
 		type TLookup = Record<TSlotName, TSlotAliasArg>;
 
-		const entries = Object.entries(slotComponents) as TEntries;
+		const entries = Object.entries(Caller.Slots) as TEntries;
 		const aliasLookup = {} as TLookup;
 
 		entries.forEach(([alias, RegisteredSlotComponent]) => {
@@ -68,15 +81,20 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 		});
 
 		return aliasLookup;
-	}, [slotComponents]);
+	}, [Caller.Slots]);
 
+	// @todo Expose original source order of `children` with respect to slot aliases.
 	const result = useMemo(() => {
-		const slotNodes: TSlotNodesArg = {};
+		const slotNodes: TLocalSlotNodes = {};
 		const unmatchedChildren: ReactNode[] = [];
 		const invalidChildren: any[] = [];
-		const cachedRequiredSlotAliases = [...(requiredSlotAliases ?? [])];
+		const requiredSlotAliases = [
+			...(Caller.requiredSlotAliases ?? [])
+		];
 
-		React.Children.forEach(children, (child) => {
+		React.Children.forEach(children, (_child) => {
+			const child = _child as TSlotNode<typeof Caller>;
+
 			if (!child) {
 				invalidChildren.push(child);
 				return;
@@ -88,38 +106,35 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 				return;
 			};
 
+			// @todo Check for fragment
+
 			if (!isElementChild(child)) {
 				unmatchedChildren.push(child);
 				return;
 			}
 
-			const slotAlias = (() => {
+			const slotAlias: keyof TLocalSlotNodes | null = (() => {
 				const slotName = getComponentSlotName(child.type, child);
 
-				return slotName ? slotsAliasLookup[slotName] : null;
+				return slotName ? slotsAliasLookup[slotName] ?? null : null;
 			})();
 
-			if (slotAlias && (typeof slotComponents[slotAlias] !== 'string')) {
-				if (slotComponents[slotAlias].isRequiredSlot) {
-					cachedRequiredSlotAliases.push(slotAlias);
-				}
-			}
-
 			if (slotAlias) {
-				if (!slotNodes[slotAlias]) {
-					slotNodes[slotAlias] = child;
+				if (typeof Caller.Slots[slotAlias] !== 'string') {
+					if (Caller.Slots[slotAlias]?.isRequiredSlot) {
+						requiredSlotAliases.push(slotAlias);
+					}
 				}
-				else if (Array.isArray(slotNodes[slotAlias])) {
+				if (slotNodes[slotAlias]) {
 					slotNodes[slotAlias].push(child);
-				}
-				else {
-					slotNodes[slotAlias] = [slotNodes[slotAlias], child];
+				} else {
+					slotNodes[slotAlias] = [child];
 				}
 			}
 			else unmatchedChildren.push(child);
 		});
 
-		cachedRequiredSlotAliases.forEach((slotAlias) => {
+		requiredSlotAliases.forEach((slotAlias) => {
 			if (!slotNodes[slotAlias]) {
 				throwDevError(`Missing required slot "${String(slotAlias)}".`);
 			}
@@ -131,8 +146,7 @@ export const useSlots: IUseSlots = (children, slotComponents, requiredSlotAliase
 	return result;
 };
 
-
 export type {
-	SlotNamedComponent,     SlottedComponent,   TSlotsRecord,
-	PotentialSlotComponent,
+	WithSlotsConfig, WithSlotsConfig as SlottedComponent,
+	TSlotsRecord, SlotComponent, PotentialSlotComponent,
 } from './types';

@@ -1,19 +1,41 @@
-name: Publish Release
+name: Publish Package
 
 on:
-  workflow_call:
-    inputs:
-      channel:
-        required: true
-        type: string
-    secrets:
-      NPM_TOKEN:
-        required: true
+  push:
+    branches: ["stable", "beta"]
+  pull_request:
+    types: [synchronize, ready_for_review]
+    branches: ["stable", "beta", "lts/*", 'v[0-9]+.[0-9]+.x']
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  # workflow_call:
+  #   inputs:
+  #     channel:
+  #       required: true
+  #       type: string
+  #   secrets:
+  #     NPM_TOKEN:
+  #       required: true
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: write
+  pages: write
+
+env:
+  channel: ${{ contains(fromJSON('["stable", "lts/**", "v[0-9]+.[0-9]+.x"]'), github.ref_name) && 'stable' || (github.ref_name == 'beta' && 'beta' || 'alpha') }}
+  # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these ongoing deployments to complete.
+concurrency:
+  group: "publish-release--(${{ github.ref_name }})"
+  cancel-in-progress: false
 
 jobs:
   publish-release:
     runs-on: ubuntu-latest
+    if: github.repository == 'cleanjsweb/oore'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,9 +44,16 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
+          node-version: '24'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
+      - name: Node version
+        run: |
+          echo "Node:" && node -v
+          echo "npm:" && npm -v
+
+      # @todo Handle potential untrusted code from source branch.
       - name: Use Source Branch #  | xargs echo
         if: github.event_name == 'pull_request'
         run: echo "${{ github.head_ref }}" && git checkout ${{ github.head_ref }}
@@ -34,12 +63,12 @@ jobs:
         run: echo "version=$(npm list . --json | jq .version | xargs echo)" >> "$GITHUB_OUTPUT" && echo "$(<$GITHUB_OUTPUT)"
   
       - name: Get Revision Index
-        if: inputs.channel != 'stable'
+        if: env.channel != 'stable'
         id: get_revision_index
-        run: echo "new_index=$(git tag -l 'v${{steps.extract_version.outputs.version}}-${{inputs.channel}}.[0-9]*' | wc -l | xargs echo)" >> $GITHUB_OUTPUT && echo "$(<$GITHUB_OUTPUT)"
+        run: echo "new_index=$(git tag -l 'v${{steps.extract_version.outputs.version}}-${{env.channel}}.[0-9]*' | wc -l | xargs echo)" >> $GITHUB_OUTPUT && echo "$(<$GITHUB_OUTPUT)"
 
       - name: Print Revision Index
-        if: inputs.channel != 'stable'
+        if: env.channel != 'stable'
         run: echo "version => ${{steps.extract_version.outputs.version}}" && echo "revision => ${{steps.get_revision_index.outputs.new_index }}"
 
       - name: Add Version Tag
@@ -49,13 +78,13 @@ jobs:
           # -> Autotag will look for the appropriate file in in this location (relative to project root).
           root: "./" # optional, default is ./
           # -> Head branch to compare changes. It uses master by default
-          head_branch: main # optional, default is master
+          head_branch: stable # optional, default is master
           # -> Options include 'package' (for package.json), 'docker' (for Dockerfile), and 'regex' to extract from an arbitrary file. This does not need to be specified if the "regex_pattern" property is provided.
           strategy: package # optional, default is package
           # -> By default, package.json uses semantic versioning, such as "1.0.0". A prefix can be used to add text before the tag name. For example, if tag_prefx is set to "v", then the tag would be labeled as "v1.0.0".
           tag_prefix: v # optional
           # -> Text which is applied to the end of the tag.
-          tag_suffix: ${{ inputs.channel != 'stable' && format('-{0}.{1}', inputs.channel, steps.get_revision_index.outputs.new_index) || '' }} # optional
+          tag_suffix: ${{ env.channel != 'stable' && format('-{0}.{1}', env.channel, steps.get_revision_index.outputs.new_index) || '' }} # optional
           # -> This is the annotated commit message associated with the tag. By default, a changelog will be generated from the commits between the latest tag and the new tag (HEAD). This will override that with a hard-coded message.
           tag_message: Version tag automatically added for published release. # optional
           # -> The commit message template (per commit). Default is `{{number}}) {{message}} ({{author}}) SHA: {{sha}}`
@@ -70,25 +99,32 @@ jobs:
       - name: Check current branch
         run: git branch && git tag -l
 
-      # - name: Add "latest" Tag # git tag 'latest' --force
-      #   if: inputs.channel == 'stable'
-      #   uses: weareyipyip/walking-tag-action@v2.0.0
-      #   with:
-      #     # -> Name of the tag to update
-      #     tag-name: latest
-      #     # -> Message of the tag to update
-      #     tag-message: This tag marks the commit of the latest stable release.
-      - run: git tag 'latest' --force && git tag -l && git push origin latest -f
+      - name: Add "sample-tag" Tag
+        if: env.channel == 'stable'
+        uses: weareyipyip/walking-tag-action@v2.0.0
+        with:
+          # -> Name of the tag to update
+          tag-name: sample-tag
+          # -> Message of the tag to update
+          tag-message: 'Throwaway tag for testing workflow setup'
+      - name: Add "latest" Tag
+        if: github.ref_name == 'stable'
+        run: |
+          git tag 'latest' --force -m "This tag marks the commit of the latest stable release."
+          git tag -l
+          git push origin latest -f
 
       - name: Check Outputs
         run: echo "${{ toJSON(steps.add_version_tag.outputs) }}" && git tag -l
 
       - run: npm ci
       - run: npm version ${{ steps.add_version_tag.outputs.tagname }} --no-git-tag-version
-        if: inputs.channel != 'stable'
-      - run: npm publish ${{ inputs.channel != 'stable' && format('{0} {1}', '--tag', inputs.channel) || '' }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: env.channel != 'stable'
+
+      - run: npm publish --tag ${{ env.channel }} ${{ env.channel == 'stable' && '--tag latest' || ''}}
+        # format('{0} {1}', '', env.channel)
+        # env:
+        #  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Github Release
         id: github_release
@@ -99,18 +135,18 @@ jobs:
           # -> The name of the release. For example, `Release v1.0.1`
           release_name: ${{steps.add_version_tag.outputs.tagname}} # optional
           # -> Conventional changelog preset. Possible values: 'angular', 'atom', 'codemirror', 'ember', 'eslint', 'express', 'jquery', 'jshint'
-          # preset: ${{ inputs.channel == 'stable' && null || 'angular' }} # optional
+          # preset: ${{ env.channel == 'stable' && null || 'angular' }} # optional
           # -> `true` to create a draft (unpublished) release, `false` to create a published one. Default: `false`
           draft: true # optional
           # -> `true` to identify the release as a prerelease. `false` to identify the release as a full release. Default: `false`
-          prerelease: ${{ inputs.channel != 'stable' }} # optional
+          prerelease: ${{ env.channel != 'stable' }} # optional
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-docs:
     runs-on: ubuntu-latest
     needs: publish-release
-    if: inputs.channel == 'stable'
+    if: github.ref_name == 'stable'
     steps:
       - name: Checkout
         uses: actions/checkout@v4

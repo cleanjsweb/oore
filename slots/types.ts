@@ -32,10 +32,10 @@ export type DisplayNamedComponent<
 > = TComponent & { displayName: TName };
 
 
-interface ISlotConfig<TName> {
+export interface ISlotInfo<TName> {
 	slotName: TName,
 	/**
-	 * @deprecated The SlottedComponent should be responsible for indicating which slots it requires.
+	 * @deprecated The {@link WithSlotsConfig | Slots Config} should be responsible for indicating which slots it requires.
 	 * Individual slot components may be reused by multiple slotted components with varying requirements.
 	 */
 	isRequiredSlot?: boolean,
@@ -99,7 +99,7 @@ export type SlotComponent<
 > = (
 	TComponent extends string
 		? TComponent
-		: TComponent & ISlotConfig<TName>
+		: (TComponent & ISlotInfo<TName>)
 );
 
 
@@ -141,11 +141,11 @@ export type TSlotNode<
  * A record of slot aliases mapped to the corresponding `ReactNode`(s)
  * to be rendered for that slot.
  */
-export type TSlotNodes<TSlotted extends WithSlotsConfig> = {
+export type TSlotNodes<TSlotted extends WithSlotsConfig<object>> = {
 	[Key in keyof TSlotted['Slots']]?: Array<TSlotNode<TSlotted, Key>>;
 };
 
-export type TUseSlotsResult<TSlotted extends WithSlotsConfig> = Readonly<[
+export type TUseSlotsResult<TSlotted extends WithSlotsConfig<object>> = Readonly<[
 	/**
 	 * A record of slot aliases to their corresponding React nodes.
 	 * Each alias maps to an array of one or more React nodes that were passed
@@ -166,7 +166,7 @@ export type TUseSlotsResult<TSlotted extends WithSlotsConfig> = Readonly<[
 ]>;
 
 export interface IUseSlots {
-	<TSlotted extends WithSlotsConfig>(
+	<TSlotted extends WithSlotsConfig<object>>(
 		/**
 		 * Your component's `children` prop.
 		 * The nodes it contains will be categorized and

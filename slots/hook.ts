@@ -15,7 +15,7 @@ export const isElementChild = (child: ReactNode): child is ReactElement<any, any
 
 
 interface IGetSlotName {
-	(TargetComponent: PotentialSlotComponent, child?: ReactElement): string | undefined;
+	(TargetComponent: PotentialSlotComponent, child?: ReactElement): keyof any | undefined;
 }
 
 export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
@@ -28,12 +28,16 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 		}
 	}
 
-	if (typeof TargetComponent === 'string') {
+	if (['string', 'symbol'].includes(typeof TargetComponent)) {
 		return TargetComponent;
-	} else if ('slotName' in TargetComponent) {
-		return TargetComponent.slotName;
-	} else if ('displayName' in TargetComponent) {
-		return TargetComponent.displayName;
+	}
+	
+	if (typeof TargetComponent === 'object' || typeof TargetComponent === 'function') {
+		if ('slotName' in TargetComponent) {
+			return TargetComponent.slotName;
+		} else if ('displayName' in TargetComponent) {
+			return TargetComponent.displayName;
+		}
 	}
 
 	return undefined;

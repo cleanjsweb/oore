@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { VoidFunctionComponent } from 'react';
+import type { FunctionComponent } from 'react';
 import type { TPropsBase } from '../logic';
 import type { Extractor } from './types/extractor';
 
@@ -117,7 +117,7 @@ export class ClassComponent<
 		);
 
 		type ComponentProps = InstanceType<typeof Component>['props'];
-		type TWrapper = VoidFunctionComponent<ComponentProps>;
+		type TWrapper = FunctionComponent<ComponentProps>;
 
 
 		/*************************************

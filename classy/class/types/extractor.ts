@@ -1,4 +1,4 @@
-import type { VoidFunctionComponent } from 'react';
+import type { FunctionComponent } from 'react';
 import type { ClassComponent } from '..';
 
 
@@ -10,4 +10,4 @@ export type Extractor = <
 	this: TComponentClass,
 	Component?: TComponentClass | null,
 	properties?: TProperties
-) => NonNullable<TProperties> & VoidFunctionComponent<InstanceType<TComponentClass>['props']>;
+) => NonNullable<TProperties> & FunctionComponent<InstanceType<TComponentClass>['props']>;

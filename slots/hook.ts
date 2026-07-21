@@ -28,14 +28,18 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 		}
 	}
 
-	if (typeof TargetComponent === 'string') {
+	if (['string', 'symbol'].includes(typeof TargetComponent)) {
 		return TargetComponent;
-	} else if ('slotName' in TargetComponent) {
-		return TargetComponent.slotName;
-	} else if ('displayName' in TargetComponent) {
-		return TargetComponent.displayName;
-	} else if ('name' in TargetComponent) {
-		return TargetComponent.name;
+	}
+	
+	if (typeof TargetComponent === 'object' || typeof TargetComponent === 'function') {
+		if ('slotName' in TargetComponent) {
+			return TargetComponent.slotName;
+		} else if ('displayName' in TargetComponent) {
+			return TargetComponent.displayName;
+		} else if ('name' in TargetComponent) {
+			return TargetComponent.name;
+		}
 	}
 
 	return undefined;

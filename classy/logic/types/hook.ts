@@ -1,4 +1,4 @@
-import type { ComponentLogic, TPropsBase } from '..';
+import type { ComponentLogic, NonPrimitive } from '..';
 
 
 /*************************************

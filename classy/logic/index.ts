@@ -5,18 +5,6 @@ import { useMemo, useRef } from 'react';
 import { useCleanState } from '@/base/state';
 
 
-/**
- * The base type for the `props` type argument.
- * 
- * This is not the type of the `props` property itself.
- * It merely defines the type constraint for the type argument
- * passed when extending any of the logic classes.
- * 
- * It accepts null for components that don't take any props.
- */
-export type TPropsBase = NonPrimitive | null;
-
-
 
 /**
  * Base class for a class that holds methods to be used in a function component.
@@ -31,7 +19,7 @@ export type TPropsBase = NonPrimitive | null;
  * 
  * @typeParam TProps - {@include ./types/tprops.md}
  */
-export class ComponentLogic<TProps extends TPropsBase = null> {
+export class ComponentLogic<TProps extends NonPrimitive = EmptyObject> {
 	/**
 	 * A {@link TCleanState | `CleanState`} object.
 	 * Holds all of your component's state,
@@ -41,7 +29,7 @@ export class ComponentLogic<TProps extends TPropsBase = null> {
 	declare readonly state: TCleanState<ReturnType<this['getInitialState']>>;
 
 	/** The props passed into your component at the time of rendering. */
-	declare readonly props: TProps extends null ? EmptyObject : TProps;
+	declare readonly props: TProps;
 
 	/**
 	 * Values received from the hooks your component consumes.
@@ -63,7 +51,7 @@ export class ComponentLogic<TProps extends TPropsBase = null> {
 	 * It receives the initial `props` object and should return
 	 * an object with the initial values for your component's state.
 	 */
-	getInitialState = (props: TProps extends null ? undefined : TProps): object => ({});
+	getInitialState = (props: TProps): object => ({});
 
 	/**
 	 * Call React hooks from here. If your component needs

@@ -1,6 +1,5 @@
 import type React from 'react';
 import type { FunctionComponent } from 'react';
-import type { TPropsBase } from '../logic';
 import type { Extractor } from './types/extractor';
 
 import { useMemo } from 'react';
@@ -28,7 +27,7 @@ import { useRerender } from '@/helpers/rerender';
  * with little to no changes to their existing semantics/implementation.
  */
 export class ClassComponent<
-			TProps extends TPropsBase = null 
+			TProps extends NonPrimitive = EmptyObject 
 		> extends ComponentInstance<TProps> {
 	/**
 	 * Analogous to {@link React.Component.render}. A function that returns

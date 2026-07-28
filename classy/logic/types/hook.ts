@@ -1,4 +1,4 @@
-import type { ComponentLogic, NonPrimitive } from '..';
+import type { ComponentLogic } from '..';
 
 
 /*************************************
@@ -8,7 +8,7 @@ import type { ComponentLogic, NonPrimitive } from '..';
 
 // type ULClassParam = typeof ComponentLogic<NonNullable<TPropsBase>>;
 type ULClassParam = typeof ComponentLogic<NonNullable<any>>;
-type ULProplessClassParam = typeof ComponentLogic<null>;
+type ULProplessClassParam = typeof ComponentLogic<EmptyObject>;
 
 export type UseLogic = {
     <Class extends ULProplessClassParam>(

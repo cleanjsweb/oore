@@ -1,5 +1,4 @@
 import type { UIParams, UIReturn, UseInstance } from './types/hook';
-import type { TPropsBase } from '@/classy/logic';
 
 import { useEffect } from 'react';
 
@@ -20,7 +19,7 @@ type AsyncAllowedEffectCallback = () => Awaitable<IVoidFunction>;
  * 
  * @see https://github.com/cleanjsweb/neat-react#lifecycle-useinstance
  */
-export class ComponentInstance<TProps extends TPropsBase = null>
+export class ComponentInstance<TProps extends NonPrimitive = EmptyObject>
 		extends ComponentLogic<TProps> {
 	/**
 	 * Runs only _before_ the first render,
@@ -104,7 +103,7 @@ export class ComponentInstance<TProps extends TPropsBase = null>
 	 * PS: You can conditionally update state from here, but with certain caveats.
 	 * {@link https://react.dev/reference/react/useState#storing-information-from-previous-renders | See the React docs for details}.
 	 */
-	beforeRender: () => object | void = () => {};
+	beforeRender: () => any = () => ({});
 
 	/**
 	 * Runs **_after_** every render cycle, including the first.

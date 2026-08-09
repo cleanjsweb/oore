@@ -1,5 +1,4 @@
 import type { UIParams, UIReturn, UseInstance } from './types/hook';
-import type { TPropsBase } from '@/classy/logic';
 
 import { useEffect } from 'react';
 
@@ -20,7 +19,7 @@ type AsyncAllowedEffectCallback = () => Awaitable<IVoidFunction | void>;
  * 
  * @see https://github.com/cleanjsweb/neat-react#lifecycle-useinstance
  */
-export class ComponentInstance<TProps extends TPropsBase = null>
+export class ComponentInstance<TProps extends NonPrimitive = EmptyObject>
 		extends ComponentLogic<TProps> {
 	/**
 	 * Runs only _before_ the first render,

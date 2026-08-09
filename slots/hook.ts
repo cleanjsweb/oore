@@ -15,7 +15,7 @@ export const isElementChild = (child: ReactNode): child is ReactElement<any, any
 
 
 interface IGetSlotName {
-	(TargetComponent: PotentialSlotComponent, child?: ReactElement): string | undefined;
+	(TargetComponent: PotentialSlotComponent, child?: ReactElement): keyof any | undefined;
 }
 
 export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
@@ -31,7 +31,7 @@ export const getComponentSlotName: IGetSlotName = (TargetComponent, child) => {
 	if (['string', 'symbol'].includes(typeof TargetComponent)) {
 		return TargetComponent;
 	}
-	
+
 	if (typeof TargetComponent === 'object' || typeof TargetComponent === 'function') {
 		if ('slotName' in TargetComponent) {
 			return TargetComponent.slotName;
@@ -153,8 +153,7 @@ export const useSlots: IUseSlots = (children, Caller) => {
 	return result;
 };
 
-
 export type {
-	SlottedComponent,   TSlotsRecord,
-	SlotComponent,      PotentialSlotComponent,
+	WithSlotsConfig, WithSlotsConfig as SlottedComponent,
+	TSlotsRecord, SlotComponent, PotentialSlotComponent,
 } from './types';

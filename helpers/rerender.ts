@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMountState } from '@/helpers/mount-state';
 
 
@@ -68,3 +68,35 @@ export const useRerender: IUseRender = () => {
 
 	return refresher;
 };
+
+
+type VF = VoidFunction;
+
+export const useConst = <T>(cb: () => T) => {
+	return useRef(useMemo(cb, [])).current;
+}
+
+export const useNextRender = () => {
+	const prerenderQueue = useConst(() => new Set<VF>());
+	const postrenderQueue = useConst(() => new Set<VF>());
+
+	prerender: {
+		prerenderQueue.forEach((cb) => {
+			prerenderQueue.delete(cb);
+			cb();
+		});
+	}
+
+	postrender: useEffect(() => {
+		postrenderQueue.forEach((cb) => {
+			postrenderQueue.delete(cb);
+			cb();
+		});
+	});
+
+	return useMemo(() => ({
+		pre: (cb: VF) => prerenderQueue.add(cb),
+		post: (cb: VF) => postrenderQueue.add(cb),
+	}), [prerenderQueue, postrenderQueue]);
+};
+

@@ -9,7 +9,7 @@ import { noOp } from '@/helpers';
 // @todo Use rollup. Insert globals.ts reference tag to all d.ts output files.
 
 
-type AsyncAllowedEffectCallback = () => Awaitable<IVoidFunction>;
+type AsyncAllowedEffectCallback = () => Awaitable<IVoidFunction | void>;
 
 
 /**
@@ -167,6 +167,8 @@ export const useInstance: UseInstance = (...args: UIParams): UIReturn => {
 			else cleanupAfterRerender?.then((cleanUp?: FunctionType) => cleanUp?.());
 		};
 	});
+
+	// class FormValues<TValues> extends BrowserMemStore<TValues> {}
 
 	return instance;
 };

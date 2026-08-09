@@ -122,11 +122,11 @@ export type WithSlotsConfig<
 export type { WithSlotsConfig as SlottedComponent };
 
 
-export type TypedNode<P, T extends JSXTagLike> = (
+export type TypedNode<P, T extends JSXTagLike> = Omit<ReactElement<P>, 'type'> & { type: T }; /* (
 	ReactElement<P, T> | (
 		ReactElement<P, T> & ReactPortal
 	)
-);
+); */
 
 export type TSlotNode<
 		TConfig extends WithSlotsConfig<object>,
